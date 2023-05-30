@@ -114,12 +114,9 @@ public class DatabaseConntection
                     x.Description = x.Body[start..end];
                 }
 
-                x.Pts = (string.IsNullOrEmpty(x.Title) ? 0 : (x.Title.Contains(term)  ? 1 * term.Length * 30 : term.Length * -10)) +
-                        (string.IsNullOrEmpty(x.Title) ? 0 : (x.Title.Contains(query) ? 1 * term.Length * 50 : term.Length * -5)) +
-                        (string.IsNullOrEmpty(x.Url)   ? 0 : (x.Url.Contains(term)    ? 1 * term.Length * 15 : term.Length * -5) +
-                        (string.IsNullOrEmpty(x.Url)   ? 0 : (x.Url.Contains(query)   ? 1 * term.Length * 30 : term.Length * -2.5)) +
-                        (string.IsNullOrEmpty(x.Body)  ? 0 : (x.Body.Contains(term)   ? 1 * term.Length *  5 : term.Length * -30) +
-                        (string.IsNullOrEmpty(x.Body)  ? 0 : (x.Body.Contains(query)  ? 1 * term.Length * 50 : term.Length * -1))));
+                x.Pts = (string.IsNullOrEmpty(x.Title) ? 0 : CalculateScore(query, x.Title) * term.Length * 30 +
+                        (string.IsNullOrEmpty(x.Url)   ? 0 : CalculateScore(query, x.Url)   * term.Length * 15 +
+                        (string.IsNullOrEmpty(x.Body)  ? 0 : CalculateScore(query, x.Body)  * term.Length *  5)));
 
                 result.SearchResults.Add(new WebSiteInfo
                 {
@@ -135,5 +132,59 @@ public class DatabaseConntection
         result.SearchResults = result.SearchResults.OrderByDescending(x => x.Pts).ToList();
 
         return result;
+    }
+
+    public static double CalculateScore(string query, string text)
+    {
+        // Convert both query and text to lowercase for case-insensitive comparison
+        query = query.ToLower();
+        text = text.ToLower();
+
+        // Split the text into individual words
+        string[] words = text.Split(new[] { ' ', '\t', '\n', '\r', '.', ',', ';', '!', '?' }, StringSplitOptions.RemoveEmptyEntries);
+
+        // Create a dictionary to store the frequency of each word in the text
+        Dictionary<string, int> wordFrequency = new Dictionary<string, int>();
+
+        foreach (string word in words)
+        {
+            if (wordFrequency.ContainsKey(word))
+            {
+                wordFrequency[word]++;
+            }
+            else
+            {
+                wordFrequency[word] = 1;
+            }
+        }
+
+        // Split the query into individual words
+        string[] queryWords = query.Split(new[] { ' ', '\t', '\n', '\r', '.', ',', ';', '!', '?' }, StringSplitOptions.RemoveEmptyEntries);
+
+        // Calculate the score based on word proximity, frequency, and positive/negative weight
+        double score = 0;
+        int lastMatchIndex = -1;
+        foreach (string queryWord in queryWords)
+        {
+            if (wordFrequency.ContainsKey(queryWord))
+            {
+                int wordFrequencyInText = wordFrequency[queryWord];
+                int matchIndex = text.IndexOf(queryWord, lastMatchIndex + 1, StringComparison.OrdinalIgnoreCase);
+
+                if (matchIndex != -1)
+                {
+                    double proximityScore = 1.0 / (1.0 + Math.Abs(matchIndex - lastMatchIndex));
+                    double weight = wordFrequencyInText > 0 ? 1.0 : -1.0;
+                    score += proximityScore * wordFrequencyInText * weight;
+                    lastMatchIndex = matchIndex;
+                }
+            }
+            else
+            {
+                score -= 1.0; // Penalty for missing query word in the text
+            }
+        }
+
+        return score;
     }
 }
