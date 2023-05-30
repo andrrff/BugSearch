@@ -1,6 +1,7 @@
 using MongoDB.Driver;
 using BugSearch.Shared.Models;
 using System.Text.RegularExpressions;
+using System.Collections.Concurrent;
 
 namespace BugSearch.Shared.Services;
 
@@ -114,9 +115,9 @@ public class DatabaseConntection
                     x.Description = x.Body[start..end];
                 }
 
-                x.Pts = (string.IsNullOrEmpty(x.Title) ? 0 : CalculateScore(query, x.Title) * term.Length * 30 +
-                        (string.IsNullOrEmpty(x.Url)   ? 0 : CalculateScore(query, x.Url)   * term.Length * 15 +
-                        (string.IsNullOrEmpty(x.Body)  ? 0 : CalculateScore(query, x.Body)  * term.Length *  5)));
+                x.Pts = (string.IsNullOrEmpty(x.Title) ? 0 : CalculateScore(query, x.Title, 0.5, 1) +
+                        (string.IsNullOrEmpty(x.Url)   ? 0 : CalculateScore(query, x.Url, 0.2, 1) +
+                        (string.IsNullOrEmpty(x.Body)  ? 0 : CalculateScore(query, x.Body, 0.1, 1))));
 
                 result.SearchResults.Add(new WebSiteInfo
                 {
@@ -134,56 +135,47 @@ public class DatabaseConntection
         return result;
     }
 
-    public static double CalculateScore(string query, string text)
+    public static double CalculateScore(string query, string text, double caseWeight, double parameterWeight)
     {
-        // Convert both query and text to lowercase for case-insensitive comparison
         query = query.ToLower();
         text = text.ToLower();
 
-        // Split the text into individual words
+        
         string[] words = text.Split(new[] { ' ', '\t', '\n', '\r', '.', ',', ';', '!', '?' }, StringSplitOptions.RemoveEmptyEntries);
 
-        // Create a dictionary to store the frequency of each word in the text
-        Dictionary<string, int> wordFrequency = new Dictionary<string, int>();
+        
+        ConcurrentDictionary<string, int> wordFrequency = new ConcurrentDictionary<string, int>();
 
-        foreach (string word in words)
+        Parallel.ForEach(words, word =>
         {
-            if (wordFrequency.ContainsKey(word))
-            {
-                wordFrequency[word]++;
-            }
-            else
-            {
-                wordFrequency[word] = 1;
-            }
-        }
+            wordFrequency.AddOrUpdate(word, 1, (_, currentCount) => currentCount + 1);
+        });
 
-        // Split the query into individual words
+        
         string[] queryWords = query.Split(new[] { ' ', '\t', '\n', '\r', '.', ',', ';', '!', '?' }, StringSplitOptions.RemoveEmptyEntries);
 
-        // Calculate the score based on word proximity, frequency, and positive/negative weight
+        
         double score = 0;
         int lastMatchIndex = -1;
-        foreach (string queryWord in queryWords)
+        Parallel.ForEach(queryWords, queryWord =>
         {
-            if (wordFrequency.ContainsKey(queryWord))
+            if (wordFrequency.TryGetValue(queryWord, out int wordFrequencyInText))
             {
-                int wordFrequencyInText = wordFrequency[queryWord];
                 int matchIndex = text.IndexOf(queryWord, lastMatchIndex + 1, StringComparison.OrdinalIgnoreCase);
 
                 if (matchIndex != -1)
                 {
                     double proximityScore = 1.0 / (1.0 + Math.Abs(matchIndex - lastMatchIndex));
-                    double weight = wordFrequencyInText > 0 ? 1.0 : -1.0;
+                    double weight = wordFrequencyInText > 0 ? caseWeight : -caseWeight;
                     score += proximityScore * wordFrequencyInText * weight;
                     lastMatchIndex = matchIndex;
                 }
             }
             else
             {
-                score -= 1.0; // Penalty for missing query word in the text
+                score -= parameterWeight; 
             }
-        }
+        });
 
         return score;
     }
