@@ -119,17 +119,14 @@ public class DatabaseConntection
                         (string.IsNullOrEmpty(x.Body)  ? 0 : (x.Body.Contains(term)  ? 1      : -30) +
                         (string.IsNullOrEmpty(x.Body)  ? 0 : (x.Body.Contains(query) ? 1 * 50 : -1))));
 
-                if (x.Pts > 0)
+                result.SearchResults.Add(new WebSiteInfo
                 {
-                    result.SearchResults.Add(new WebSiteInfo
-                    {
-                        Link = x.Url,
-                        Favicon = x.Favicon,
-                        Title = x.Title,
-                        Description = x.Description,
-                        Pts = x.Pts
-                    });
-                }
+                    Link = x.Url,
+                    Favicon = x.Favicon,
+                    Title = x.Title,
+                    Description = x.Description,
+                    Pts = x.Pts
+                });
             });
         });
 
