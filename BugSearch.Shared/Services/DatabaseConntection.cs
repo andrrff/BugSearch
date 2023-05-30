@@ -16,7 +16,7 @@ public class DatabaseConntection
         const string connectionUri = "mongodb://adminuser:password123@mongodb-service.crawler-bot.svc.cluster.local:27017/admin";
 
         var client   = new MongoClient(connectionUri);
-        var database = client.GetDatabase("ifmaDB");
+        var database = client.GetDatabase("BugSearchDBV2");
 
         if (!database.ListCollectionNames().ToList().Contains("eventcrawler"))
         {
