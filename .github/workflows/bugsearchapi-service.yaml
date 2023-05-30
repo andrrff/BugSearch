@@ -1,4 +1,4 @@
-name: bugsearchcrawler-service
+name: bugsearchapi-service
 "on":
     push:
         branches:
@@ -9,11 +9,11 @@ env:
     AZURE_CONTAINER_REGISTRY: acrworkflow1684607545542
     CLUSTER_NAME: CrawlerBot
     CLUSTER_RESOURCE_GROUP: ifma-crawler
-    CONTAINER_NAME: bugsearchcrawler
+    CONTAINER_NAME: bugsearchapi
     DEPLOYMENT_MANIFEST_PATH: |
-        BugSearch.Crawler/Manifests/bugsearchcrawler-deployment.yaml
-        BugSearch.Crawler/Manifests/bugsearchcrawler-namespace.yaml
-        BugSearch.Crawler/Manifests/bugsearchcrawler-service.yaml
+        BugSearch.Api/Manifests/bugsearchapi-deployment.yaml
+        BugSearch.Api/Manifests/bugsearchapi-namespace.yaml
+        BugSearch.Api/Manifests/bugsearchapi-service.yaml
 jobs:
     buildImage:
         permissions:
@@ -58,7 +58,7 @@ jobs:
                 resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
                 use-kubelogin: "true"
             - uses: Azure/k8s-deploy@v4
-              name: Deploys application (Crawler-Bot)
+              name: Deploys application (BugSearch-Api V2)
               with:
                 action: deploy
                 images: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_NAME }}:${{ github.sha }}
