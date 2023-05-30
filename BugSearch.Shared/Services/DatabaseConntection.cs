@@ -115,19 +115,22 @@ public class DatabaseConntection
                 }
 
                 x.Pts = x.Terms.Count(term.ToLower().Contains) +
-                        (string.IsNullOrEmpty(x.Title) ? 0 : (x.Title.Contains(term) ? 1 * 10 : 0)) +
-                        (string.IsNullOrEmpty(x.Url) ? 0 : (x.Url.Contains(term) ? 1 * 7 : 0) +
-                        (string.IsNullOrEmpty(x.Body) ? 0 : (x.Body.Contains(term) ? 1 * 5 : 0) +
+                        (string.IsNullOrEmpty(x.Title) ? 0 : (x.Title.Contains(term) ? 1 * 10 : -5)) +
+                        (string.IsNullOrEmpty(x.Url) ? 0 : (x.Url.Contains(term) ? 1 * 7 : -2) +
+                        (string.IsNullOrEmpty(x.Body) ? 0 : (x.Body.Contains(term) ? 1 * 5 : -30) +
                         (string.IsNullOrEmpty(x.Body) ? 0 : (x.Body.Contains(query) ? 1 * 15 : 0))));
 
-                result.SearchResults.Add(new WebSiteInfo
+                if (x.Pts > 0)
                 {
-                    Link        = x.Url,
-                    Favicon     = x.Favicon,
-                    Title       = x.Title,
-                    Description = x.Description,
-                    Pts         = x.Pts
-                });
+                    result.SearchResults.Add(new WebSiteInfo
+                    {
+                        Link = x.Url,
+                        Favicon = x.Favicon,
+                        Title = x.Title,
+                        Description = x.Description,
+                        Pts = x.Pts
+                    });
+                }
             });
         });
 
