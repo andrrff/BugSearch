@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bugsearchapi-service
+  labels:
+    app: bugsearchapi-service
+  namespace: crawler-bot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bugsearchapi-service
+  template:
+    metadata:
+      labels:
+        app: bugsearchapi-service
+    spec:
+      containers:
+        - name: bugsearchapi-service
+          image: acrworkflow1684607545542.azurecr.io/bugsearchapi:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: MONGODB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-creds
+                  key: username
+            - name: MONGODB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-creds
+                  key: password
+            - name: DB_CONN_STRING
+              valueFrom: 
+                configMapKeyRef:
+                  name: mongodb-configmap
+                  key: database_url
