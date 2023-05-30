@@ -1,6 +1,8 @@
 name: bugsearchapi-service
 "on":
     push:
+        paths:
+            - 'BugSearch.Api/**'
         branches:
             - master
     workflow_dispatch: {}

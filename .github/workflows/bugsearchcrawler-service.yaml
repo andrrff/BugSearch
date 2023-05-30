@@ -1,6 +1,8 @@
 name: bugsearchcrawler-service
 "on":
     push:
+        paths:
+            - 'BugSearch.Crawler/**'
         branches:
             - master
     workflow_dispatch: {}
