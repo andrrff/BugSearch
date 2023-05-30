@@ -9,6 +9,11 @@ public class DistributedSpider
 {
     public static async Task RunAsync()
     {
+        var RabbitMQConnection = "amqp://guest:guest@rabbitmq-service:5672/";
+        new RabbitMQOptions()
+        {
+            
+        };
         var builder = Builder.CreateBuilder<RobotSpider>(options =>
         {
             options.Speed = 2;
