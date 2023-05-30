@@ -1,7 +1,6 @@
 using MongoDB.Driver;
 using BugSearch.Shared.Models;
 using System.Text.RegularExpressions;
-using System.Collections.Concurrent;
 
 namespace BugSearch.Shared.Services;
 
@@ -115,17 +114,20 @@ public class DatabaseConntection
                     x.Description = x.Body[start..end];
                 }
 
-                x.Pts = (string.IsNullOrEmpty(x.Title) ? 0 : CalculateScore(query, x.Title, 0.5, 1) +
-                        (string.IsNullOrEmpty(x.Url)   ? 0 : CalculateScore(query, x.Url, 0.2, 1) +
-                        (string.IsNullOrEmpty(x.Body)  ? 0 : CalculateScore(query, x.Body, 0.1, 1))));
+                x.Pts = (string.IsNullOrEmpty(x.Title) ? 0 : (x.Title.Contains(term)  ? 1 * term.Length * 30 : term.Length * -10)) +
+                        (string.IsNullOrEmpty(x.Title) ? 0 : (x.Title.Contains(query) ? 1 * term.Length * 50 : term.Length * -5)) +
+                        (string.IsNullOrEmpty(x.Url)   ? 0 : (x.Url.Contains(term)    ? 1 * term.Length * 15 : term.Length * -5) +
+                        (string.IsNullOrEmpty(x.Url)   ? 0 : (x.Url.Contains(query)   ? 1 * term.Length * 30 : term.Length * -2.5)) +
+                        (string.IsNullOrEmpty(x.Body)  ? 0 : (x.Body.Contains(term)   ? 1 * term.Length *  5 : term.Length * -30) +
+                        (string.IsNullOrEmpty(x.Body)  ? 0 : (x.Body.Contains(query)  ? 1 * term.Length * 50 : term.Length * -1))));
 
                 result.SearchResults.Add(new WebSiteInfo
                 {
-                    Link = x.Url,
-                    Favicon = x.Favicon,
-                    Title = x.Title,
+                    Link        = x.Url,
+                    Favicon     = x.Favicon,
+                    Title       = x.Title,
                     Description = x.Description,
-                    Pts = x.Pts
+                    Pts         = x.Pts
                 });
             });
         });
@@ -133,50 +135,5 @@ public class DatabaseConntection
         result.SearchResults = result.SearchResults.OrderByDescending(x => x.Pts).ToList();
 
         return result;
-    }
-
-    public static double CalculateScore(string query, string text, double caseWeight, double parameterWeight)
-    {
-        query = query.ToLower();
-        text = text.ToLower();
-
-        
-        string[] words = text.Split(new[] { ' ', '\t', '\n', '\r', '.', ',', ';', '!', '?' }, StringSplitOptions.RemoveEmptyEntries);
-
-        
-        ConcurrentDictionary<string, int> wordFrequency = new ConcurrentDictionary<string, int>();
-
-        Parallel.ForEach(words, word =>
-        {
-            wordFrequency.AddOrUpdate(word, 1, (_, currentCount) => currentCount + 1);
-        });
-
-        
-        string[] queryWords = query.Split(new[] { ' ', '\t', '\n', '\r', '.', ',', ';', '!', '?' }, StringSplitOptions.RemoveEmptyEntries);
-
-        
-        double score = 0;
-        int lastMatchIndex = -1;
-        Parallel.ForEach(queryWords, queryWord =>
-        {
-            if (wordFrequency.TryGetValue(queryWord, out int wordFrequencyInText))
-            {
-                int matchIndex = text.IndexOf(queryWord, lastMatchIndex + 1, StringComparison.OrdinalIgnoreCase);
-
-                if (matchIndex != -1)
-                {
-                    double proximityScore = 1.0 / (1.0 + Math.Abs(matchIndex - lastMatchIndex));
-                    double weight = wordFrequencyInText > 0 ? caseWeight : -caseWeight;
-                    score += proximityScore * wordFrequencyInText * weight;
-                    lastMatchIndex = matchIndex;
-                }
-            }
-            else
-            {
-                score -= parameterWeight; 
-            }
-        });
-
-        return score;
     }
 }
