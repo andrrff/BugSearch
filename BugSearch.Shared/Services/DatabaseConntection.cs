@@ -129,7 +129,7 @@ public class DatabaseConntection
                 );
             });
 
-        result.SearchResults.OrderByDescending(x => x.Pts);
+        result.SearchResults = result.SearchResults.OrderByDescending(x => x.Pts).ToList();
 
         return result;
     }
