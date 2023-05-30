@@ -118,7 +118,7 @@ public class DatabaseConntection
                         (string.IsNullOrEmpty(x.Title) ? 0 : (x.Title.Contains(term) ? 1 * 10 : -5)) +
                         (string.IsNullOrEmpty(x.Url) ? 0 : (x.Url.Contains(term) ? 1 * 7 : -2) +
                         (string.IsNullOrEmpty(x.Body) ? 0 : (x.Body.Contains(term) ? 1 * 5 : -30) +
-                        (string.IsNullOrEmpty(x.Body) ? 0 : (x.Body.Contains(query) ? 1 * 15 : 0))));
+                        (string.IsNullOrEmpty(x.Body) ? 0 : (x.Body.Contains(query) ? 1 * 15 : -1))));
 
                 if (x.Pts > 0)
                 {
