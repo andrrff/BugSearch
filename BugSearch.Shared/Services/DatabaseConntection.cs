@@ -58,14 +58,16 @@ public class DatabaseConntection
         });
     }
 
-    public Summary GetSummary()
+    public SummaryResult GetSummary()
     {
-        var summary = new Summary();
+        var result = new SummaryResult();
 
-        summary.IndexedPages = _collectionEventCrawler.CountDocuments(x => true);
-        summary.IndexedTerms = _collectionDictionary.CountDocuments(x => true);
+        result.Summary = new Summary();
 
-        return summary;
+        result.Summary.IndexedPages = _collectionEventCrawler.CountDocuments(x => true);
+        result.Summary.IndexedTerms = _collectionDictionary.CountDocuments(x => true);
+
+        return result;
     }
 
     public SearchResult FindWebSites(string query, int limit)

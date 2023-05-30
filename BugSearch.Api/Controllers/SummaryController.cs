@@ -19,7 +19,7 @@ public class SummaryController : ControllerBase
     }
 
     [HttpGet(Name = "GetSummary")]
-    public Summary Get()
+    public SummaryResult Get()
     {
         return _context.GetSummary();
     }
