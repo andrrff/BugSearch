@@ -73,61 +73,61 @@ public class DatabaseConntection
     public SearchResult FindWebSites(string query, int limit)
     {
         SearchResult result = new();
+        List<string> terms = new();
 
-        Regex
+        terms = Regex
             .Unescape(Regex.Replace(query, @"\s+", " ").Trim())
             .Split(" ")
             .Distinct()
-            .ToList()
-            .ForEach(term =>
-            {
-                var collectionEvents = _collectionEventCrawler.Find(x => x.Terms.Contains(term.ToLower()) || 
-                                                                         (string.IsNullOrEmpty(x.Title)   ||
-                                                                         x.Title.Contains(term))          ||
-                                                                         (string.IsNullOrEmpty(x.Url)     ||
+            .ToList();
+
+        Parallel.ForEach(terms, term => 
+        {
+            var collectionEvents = _collectionEventCrawler.Find(x => x.Terms.Contains(term.ToLower()) ||
+                                                                         (string.IsNullOrEmpty(x.Title) ||
+                                                                         x.Title.Contains(term)) ||
+                                                                         (string.IsNullOrEmpty(x.Url) ||
                                                                          x.Url.Contains(term)))
                                                               .Limit(limit)
                                                               .ToList();
 
-                result.SearchResults.AddRange(collectionEvents
-                    .Select(x => 
+            Parallel.ForEach(collectionEvents, x =>
+            {
+                if (string.IsNullOrEmpty(x.Description))
+                {
+                    x.Body ??= string.Empty;
+
+                    var index = x.Body.IndexOf(term, StringComparison.OrdinalIgnoreCase);
+                    var start = index - 150;
+                    var end = index + 150;
+
+                    if (start < 0)
                     {
-                        if (string.IsNullOrEmpty(x.Description))
-                        {
-                            x.Body ??= string.Empty;
+                        start = 0;
+                    }
 
-                            var index = x.Body.IndexOf(term, StringComparison.OrdinalIgnoreCase);
-                            var start = index - 150;
-                            var end   = index + 150;
+                    if (end > x.Body.Length)
+                    {
+                        end = x.Body.Length;
+                    }
 
-                            if (start < 0)
-                            {
-                                start = 0;
-                            }
+                    x.Description = x.Body[start..end];
+                }
 
-                            if (end > x.Body.Length)
-                            {
-                                end = x.Body.Length;
-                            }
-                            
-                            x.Description = x.Body[start..end];
-                        }
+                x.Pts = x.Terms.Count(term.ToLower().Contains) +
+                        (string.IsNullOrEmpty(x.Title) ? 0 : (x.Title.Contains(term) ? 1 : 0)) +
+                        (string.IsNullOrEmpty(x.Url) ? 0 : (x.Url.Contains(term) ? 1 : 0));
 
-                        x.Pts = x.Terms.Count(term.ToLower().Contains) +
-                                (string.IsNullOrEmpty(x.Title) ? 0 : (x.Title.Contains(term) ? 1 : 0)) +
-                                (string.IsNullOrEmpty(x.Url) ? 0 : (x.Url.Contains(term) ? 1 : 0));
-
-                        return new WebSiteInfo
-                        {
-                            Link        = x.Url,
-                            Favicon     = x.Favicon,
-                            Title       = x.Title,
-                            Description = x.Description,
-                            Pts         = x.Pts
-                        };
-                    })
-                );
+                result.SearchResults.Add(new WebSiteInfo
+                {
+                    Link        = x.Url,
+                    Favicon     = x.Favicon,
+                    Title       = x.Title,
+                    Description = x.Description,
+                    Pts         = x.Pts
+                });
             });
+        });
 
         result.SearchResults = result.SearchResults.OrderByDescending(x => x.Pts).ToList();
 
