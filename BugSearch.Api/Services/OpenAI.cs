@@ -12,8 +12,13 @@ public class OpenAI
     {
         string url = "https://api.openai.com/v1/chat/completions";
 
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json")
+            .Build();
+
         client.DefaultRequestHeaders.Clear();
-        client.DefaultRequestHeaders.Add("Authorization", "Bearer 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");
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {configuration.GetValue<string>("OpenAPI_Key")}");
 
         var requestBody = new OpenAIPromptRequest
         {
