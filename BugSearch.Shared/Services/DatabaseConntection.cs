@@ -68,9 +68,9 @@ public class DatabaseConntection
         return summary;
     }
 
-    public IEnumerable<WebSiteInfo> FindWebSites(string query, int limit)
+    public SearchResult FindWebSites(string query, int limit)
     {
-        List<WebSiteInfo> list = new();
+        SearchResult result = new();
 
         Regex
             .Unescape(Regex.Replace(query, @"\s+", " ").Trim())
@@ -87,7 +87,7 @@ public class DatabaseConntection
                                                               .Limit(limit)
                                                               .ToList();
 
-                list.AddRange(collectionEvents
+                result.SearchResults.AddRange(collectionEvents
                     .Select(x => 
                     {
                         if (string.IsNullOrEmpty(x.Description))
@@ -127,6 +127,8 @@ public class DatabaseConntection
                 );
             });
 
-        return list.OrderByDescending(x => x.Pts).ToList();
+        result.SearchResults.OrderByDescending(x => x.Pts);
+
+        return result;
     }
 }
