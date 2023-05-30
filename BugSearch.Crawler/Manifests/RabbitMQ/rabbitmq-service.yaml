@@ -4,7 +4,6 @@ metadata:
   namespace: crawler-bot
   name: rabbitmq-service
 spec:
-  type: LoadBalancer
   selector:
     app: rabbitmq
   ports:
