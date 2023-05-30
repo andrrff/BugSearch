@@ -18,6 +18,6 @@ public class ApiController : ControllerBase
     public async Task PostAsync([FromBody] IEnumerable<string> url)
     {
         RobotSingleton.GetInstance().SetUrls(url);
-        await RobotSpider.RunAsync();
+        await DistributedSpider.RunAsync();
     }
 }

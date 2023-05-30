@@ -6,7 +6,6 @@ using DotnetSpider.Downloader;
 using DotnetSpider.Infrastructure;
 using Microsoft.Extensions.Options;
 using DotnetSpider.Scheduler.Component;
-using DotnetSpider.RabbitMQ;
 
 namespace BugSearch.Crawler.Services;
 
@@ -20,20 +19,11 @@ public class RobotSpider : Spider
 
     public static async Task RunAsync()
     {
-        var configuration = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json")
-            .Build();
-
-        var rabbitMQOptions = new RabbitMQOptions();
-        
-        configuration.GetSection("RabbitMQ").Bind(rabbitMQOptions);
-
         var builder = Builder.CreateDefaultBuilder<RobotSpider>(x =>
         {
             x.Speed = 100;
         });
 
-        builder.UseRabbitMQ(new Action<RabbitMQOptions> (x => x = rabbitMQOptions));
         builder.IgnoreServerCertificateError();
         builder.UseDownloader<HttpClientDownloader>();
         builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();

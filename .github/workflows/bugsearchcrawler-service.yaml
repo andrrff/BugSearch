@@ -17,6 +17,9 @@ env:
         BugSearch.Crawler/Manifests/bugsearchcrawler-deployment.yaml
         BugSearch.Crawler/Manifests/bugsearchcrawler-namespace.yaml
         BugSearch.Crawler/Manifests/bugsearchcrawler-service.yaml
+        BugSearch.Crawler/Manifests/RabbitMQ/rabbitmq-deployment.yaml
+        BugSearch.Crawler/Manifests/RabbitMQ/rabbitmq-pvc.yaml
+        BugSearch.Crawler/Manifests/RabbitMQ/rabbitmq-service.yaml
 jobs:
     buildImage:
         permissions:
