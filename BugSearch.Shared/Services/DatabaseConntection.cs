@@ -114,10 +114,10 @@ public class DatabaseConntection
                     x.Description = x.Body[start..end];
                 }
 
-                x.Pts = (string.IsNullOrEmpty(x.Title) ? 0 : (x.Title.Contains(term) ? 1 * 30 : -10)) +
-                        (string.IsNullOrEmpty(x.Url)   ? 0 : (x.Url.Contains(term)   ? 1 * 7  : -5) +
-                        (string.IsNullOrEmpty(x.Body)  ? 0 : (x.Body.Contains(term)  ? 1      : -30) +
-                        (string.IsNullOrEmpty(x.Body)  ? 0 : (x.Body.Contains(query) ? 1 * 50 : -1))));
+                x.Pts = (string.IsNullOrEmpty(x.Title) ? 0 : (x.Title.Contains(term) ? 1 * term.Length * 30 : -10)) +
+                        (string.IsNullOrEmpty(x.Url)   ? 0 : (x.Url.Contains(term)   ? 1 * term.Length * 7  : -5) +
+                        (string.IsNullOrEmpty(x.Body)  ? 0 : (x.Body.Contains(term)  ? 1 * term.Length : -30) +
+                        (string.IsNullOrEmpty(x.Body)  ? 0 : (x.Body.Contains(query) ? 1 * term.Length * 50 : -1))));
 
                 result.SearchResults.Add(new WebSiteInfo
                 {
