@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BugSearch.Shared", "BugSear
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BugSearch.Crawler", "BugSearch.Crawler\BugSearch.Crawler.csproj", "{FB4EB492-E5CC-40DB-B48C-0F4FDF0FEB81}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BugSearch.Broker", "BugSearch.Broker\BugSearch.Broker.csproj", "{4FDE0537-1AEC-4990-BF4A-6E7A1F3C6CA4}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,9 +30,5 @@ Global
 		{FB4EB492-E5CC-40DB-B48C-0F4FDF0FEB81}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB4EB492-E5CC-40DB-B48C-0F4FDF0FEB81}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FB4EB492-E5CC-40DB-B48C-0F4FDF0FEB81}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4FDE0537-1AEC-4990-BF4A-6E7A1F3C6CA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4FDE0537-1AEC-4990-BF4A-6E7A1F3C6CA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4FDE0537-1AEC-4990-BF4A-6E7A1F3C6CA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4FDE0537-1AEC-4990-BF4A-6E7A1F3C6CA4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
