@@ -116,7 +116,8 @@ public class DatabaseConntection
 
                 x.Pts = x.Terms.Count(term.ToLower().Contains) +
                         (string.IsNullOrEmpty(x.Title) ? 0 : (x.Title.Contains(term) ? 1 * 10 : 0)) +
-                        (string.IsNullOrEmpty(x.Url) ? 0 : (x.Url.Contains(term) ? 1 * 7 : 0));
+                        (string.IsNullOrEmpty(x.Url) ? 0 : (x.Url.Contains(term) ? 1 * 7 : 0) +
+                        (string.IsNullOrEmpty(x.Body) ? 0 : (x.Body.Contains(term) ? 1 * 5 : 0)));
 
                 result.SearchResults.Add(new WebSiteInfo
                 {
