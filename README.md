@@ -91,6 +91,13 @@ Aqui estão os exemplos de uso em uma tabela:
 | Resumo                | `curl -X 'GET' 'http://localhost:5088/Summary' -H 'accept: text/plain'`                            |
 | Prompt                | `curl -X 'GET' 'http://localhost:5088/Prompt?q=ping' -H 'accept: text/plain'`                      |
 
+## Arquitetura
+
+<p align="center">
+  <img src="https://github.com/andrrff/BugSearch/assets/13167954/55f78bb5-9f1e-4b01-8a96-7b404075cb8f" alt="BugSearch drawio">
+</p>
+
+
 ## Contribuindo
 
 Se você deseja contribuir com o projeto BugSearch, sinta-se à vontade para abrir issues e enviar pull requests no repositório do GitHub.
