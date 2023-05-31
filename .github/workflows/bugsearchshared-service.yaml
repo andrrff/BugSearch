@@ -14,9 +14,8 @@ env:
     CLUSTER_RESOURCE_GROUP: ifma-crawler
     DEPLOYMENT_MANIFEST_PATH: |
         BugSearch.Shared/Manifests/RabbitMQ/rabbitmq-cluster.yaml
-        BugSearch.Shared/Manifests/RabbitMQ/rabbitmq-deployment.yaml
-        BugSearch.Shared/Manifests/RabbitMQ/rabbitmq-pvc.yaml
-        BugSearch.Shared/Manifests/RabbitMQ/rabbitmq-service.yaml
+        BugSearch.Shared/Manifests/RabbitMQ/rabbitmq-secrets.yaml
+        BugSearch.Shared/Manifests/RabbitMQ/rabbitmq-configmap.yaml
         BugSearch.Shared/Manifests/MongoDB/mongodb-configmap.yaml
         BugSearch.Shared/Manifests/MongoDB/mongodb-deployment.yaml
         BugSearch.Shared/Manifests/MongoDB/mongodb-service.yaml
@@ -26,6 +25,7 @@ env:
         BugSearch.Shared/Manifests/MongoExpress/mongoexpress-deployment.yaml
         BugSearch.Shared/Manifests/MongoExpress/mongoexpress-service.yaml
         BugSearch.Shared/Manifests/AAD/aad-secrets.yaml
+        BugSearch.Shared/Manifests/OpenAI/openai-secrets.yaml
 jobs:
     buildImage:
         permissions:

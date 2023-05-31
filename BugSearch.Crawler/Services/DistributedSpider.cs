@@ -1,6 +1,7 @@
 using DotnetSpider;
 using DotnetSpider.RabbitMQ;
 using DotnetSpider.Scheduler;
+using BugSearch.Shared.Services;
 using DotnetSpider.Scheduler.Component;
 
 namespace BugSearch.Crawler.Services;
@@ -12,16 +13,16 @@ public class DistributedSpider
 
         var builder = Builder.CreateBuilder<RobotSpider>(options =>
         {
-            options.Speed = 2;
+            options.Speed = 100;
         });
 
         builder.UseRabbitMQ(new Action<RabbitMQOptions> (options =>
         {
-            options.HostName = "20.124.78.150";
-            options.Port     = 5672;
-            options.UserName = "guest";
-            options.Password = "guest";
-            options.Exchange = "BugSearch";
+            options.HostName = KubernetesClient.GetConfigMap("rabbitmq-creds", "hostname");
+            options.Port     = int.Parse(KubernetesClient.GetConfigMap("rabbitmq-creds", "port"));
+            options.UserName = KubernetesClient.GetSecret("rabbitmq-creds", "username");
+            options.Password = KubernetesClient.GetSecret("rabbitmq-creds", "password");
+            options.Exchange = KubernetesClient.GetConfigMap("rabbitmq-creds", "exchange");
         }));
         builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
         await builder.Build().RunAsync();

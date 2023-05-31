@@ -10,7 +10,7 @@ spec:
       cpu: 500m
       memory: 1Gi
     limits:
-      cpu: 1
+      cpu: 3
       memory: 2Gi
   rabbitmq:
           additionalConfig: |

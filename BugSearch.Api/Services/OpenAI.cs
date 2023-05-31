@@ -16,7 +16,7 @@ public class OpenAI
             string url = "https://api.openai.com/v1/chat/completions";
 
             client.DefaultRequestHeaders.Clear();
-            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {PowerKeyVault.GetInstance().GetKeyVaultSecret("OpenApiKey")}");
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {KubernetesClient.GetSecret("openai-creds", "apikey")}");
 
             var requestBody = new OpenAIPromptRequest
             {

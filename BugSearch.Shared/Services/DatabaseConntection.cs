@@ -9,28 +9,33 @@ public class DatabaseConntection
     private readonly IMongoCollection<EventCrawler> _collectionEventCrawler;
     private readonly IMongoCollection<Dictionary> _collectionDictionary;
 
-    private readonly IMongoCollection<Summary> _collectionSummary;
-
     public DatabaseConntection()
     {
-        const string connectionUri = "mongodb://adminuser:password123@mongodb-service.crawler-bot.svc.cluster.local:27017/admin";
+        var url      = KubernetesClient.GetConfigMap("mongodb-configmap", "database_url");
+        var username = KubernetesClient.GetSecret("mongo-creds", "username");
+        var password = KubernetesClient.GetSecret("mongo-creds", "password");
+
+        var databaseName               = KubernetesClient.GetConfigMap("mongodb-configmap", "database");
+        var collectionDictionaryName   = KubernetesClient.GetConfigMap("mongodb-configmap", "collection_dictionary");
+        var collectionEventCrawlerName = KubernetesClient.GetConfigMap("mongodb-configmap", "collection_event_crawler");
+
+        var connectionUri = $"mongodb://{username}:{password}@{url}/admin";
 
         var client   = new MongoClient(connectionUri);
-        var database = client.GetDatabase("BugSearchDBV2");
+        var database = client.GetDatabase(databaseName);
 
-        if (!database.ListCollectionNames().ToList().Contains("eventcrawler"))
+        if (!database.ListCollectionNames().ToList().Contains(collectionEventCrawlerName))
         {
-            database.CreateCollection("eventcrawler");
+            database.CreateCollection(collectionEventCrawlerName);
         }
 
-        if (!database.ListCollectionNames().ToList().Contains("dictionary"))
+        if (!database.ListCollectionNames().ToList().Contains(collectionDictionaryName))
         {
-            database.CreateCollection("dictionary");
+            database.CreateCollection(collectionDictionaryName);
         }
 
-        _collectionEventCrawler = database.GetCollection<EventCrawler>("eventcrawler");
-        _collectionDictionary   = database.GetCollection<Dictionary>("dictionary");
-        _collectionSummary      = database.GetCollection<Summary>("summary");
+        _collectionEventCrawler = database.GetCollection<EventCrawler>(collectionEventCrawlerName);
+        _collectionDictionary   = database.GetCollection<Dictionary>(collectionDictionaryName);
     }
 
     public void InsertEventCrawler(EventCrawler eventCrawler)
