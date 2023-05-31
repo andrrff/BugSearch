@@ -28,7 +28,6 @@ jobs:
     buildImage:
         runs-on: ubuntu-latest
         steps:
-            # Adicione as etapas para construir a imagem do contêiner aqui
             - name: Build container image
                 run: echo "Building container image..."
     deploy:
