@@ -11,6 +11,13 @@ public class TestController : ControllerBase
     [HttpGet]
     public async Task<string> GetAsync()
     {
-        return KubernetesClient.GetAllSecrets();
+        try
+        {
+            return KubernetesClient.GetAllSecrets();
+        }
+        catch (Exception ex)
+        {
+            return ex.ToString();            
+        }
     }
 }
