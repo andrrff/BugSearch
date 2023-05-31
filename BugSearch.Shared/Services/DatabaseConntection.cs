@@ -11,13 +11,13 @@ public class DatabaseConntection
 
     public DatabaseConntection()
     {
-        var url      = KubernetesClient.GetConfigMap("mongodb-configmap", "database_url");
-        var username = KubernetesClient.GetSecret("mongo-creds", "username");
-        var password = KubernetesClient.GetSecret("mongo-creds", "password");
+        var url      = EnvironmentService.GetValue("MONGO_DATABASE_URL");
+        var username = EnvironmentService.GetValue("MONGO_USERNAME");
+        var password = EnvironmentService.GetValue("MONGO_PASSWORD");
 
-        var databaseName               = KubernetesClient.GetConfigMap("mongodb-configmap", "database");
-        var collectionDictionaryName   = KubernetesClient.GetConfigMap("mongodb-configmap", "collection_dictionary");
-        var collectionEventCrawlerName = KubernetesClient.GetConfigMap("mongodb-configmap", "collection_event_crawler");
+        var databaseName               = EnvironmentService.GetValue("MONGO_DATABASE");
+        var collectionDictionaryName   = EnvironmentService.GetValue("MONGO_COLLECTION_DICTIONARY");
+        var collectionEventCrawlerName = EnvironmentService.GetValue("MONGO_COLLECTION_EVENT_CRAWLER");
 
         var connectionUri = $"mongodb://{username}:{password}@{url}/admin";
 
