@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bugsearchshared-service
+  labels:
+    app: bugsearchshared-service
+  namespace: namespace-workflow-1685570291580
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bugsearchshared-service
+  template:
+    metadata:
+      labels:
+        app: bugsearchshared-service
+    spec:
+      containers:
+        - name: bugsearchshared-service
+          image: acrworkflow1684607545542.azurecr.io/image-workflow-1685570291580:latest
+          ports:
+            - containerPort: 5000
