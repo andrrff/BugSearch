@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using BugSearch.Api.Models;
+using BugSearch.Shared.Services;
 
 namespace BugSearch.Api.Services;
 
@@ -12,13 +13,8 @@ public class OpenAI
     {
         string url = "https://api.openai.com/v1/chat/completions";
 
-        var configuration = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json")
-            .Build();
-
         client.DefaultRequestHeaders.Clear();
-        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {configuration.GetValue<string>("OpenAPI_Key")}");
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {PowerKeyVault.GetInstance().GetKeyVaultSecret("OpenApiKey")}");
 
         var requestBody = new OpenAIPromptRequest
         {
