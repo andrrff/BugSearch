@@ -1,3 +1,4 @@
+using Azure.Core;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 
@@ -34,16 +35,22 @@ public class PowerKeyVault
         {
             client = new SecretClient(
                 new Uri("https://bugsearch.vault.azure.net/"),
-                new DefaultAzureCredential(),
+                new DefaultAzureCredential(
+                    new DefaultAzureCredentialOptions
+                    {
+                        ManagedIdentityClientId = "c28de984-1d55-46d9-a08d-8a17ed83bb2e",
+                        ManagedIdentityResourceId = new ResourceIdentifier("https://bugsearch.vault.azure.net/")
+                    }
+                ),
                 //new InteractiveBrowserCredential(),
                 new SecretClientOptions
                 {
                     Retry =
                     {
-                                Delay      = TimeSpan.FromSeconds(2),
-                                MaxDelay   = TimeSpan.FromSeconds(16),
-                                MaxRetries = 5,
-                                Mode       = Azure.Core.RetryMode.Exponential
+                        Delay      = TimeSpan.FromSeconds(2),
+                        MaxDelay   = TimeSpan.FromSeconds(16),
+                        MaxRetries = 5,
+                        Mode       = Azure.Core.RetryMode.Exponential
                     }
                 }
             )
