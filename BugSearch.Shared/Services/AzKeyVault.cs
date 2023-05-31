@@ -36,11 +36,10 @@ public class PowerKeyVault
             client = new SecretClient(
                 new Uri("https://bugsearch.vault.azure.net/"),
                 new ClientSecretCredential(
-                    KubernetesClient.GetKubernetesSecret("aad-creds","tenantid"),
-                    KubernetesClient.GetKubernetesSecret("aad-creds","clientid"),
-                    KubernetesClient.GetKubernetesSecret("aad-creds","clientsecret"))
-                    ),
-                // new InteractiveBrowserCredential()
+                    "02b6749b-5ce0-4853-bd5c-a05f9bd9dd3a",
+                    "7eeda667-ae25-4ed5-a187-ab146a527366",
+                    "FkV8Q~6fQ9ggPSDg73djJWwZfl2LavfsZmXwWb8x"
+            ))
         };
 
     public async Task<KeyVaultSecret> GetKeyVaultSecretAsync(string name) => await client.GetSecretAsync(name);

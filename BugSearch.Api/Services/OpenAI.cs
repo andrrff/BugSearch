@@ -11,16 +11,18 @@ public class OpenAI
 
     public static async Task<string> PromptSearch(string query)
     {
-        string url = "https://api.openai.com/v1/chat/completions";
-
-        client.DefaultRequestHeaders.Clear();
-        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {PowerKeyVault.GetInstance().GetKeyVaultSecret("OpenApiKey")}");
-
-        var requestBody = new OpenAIPromptRequest
+        try
         {
-            model = "gpt-3.5-turbo",
-            temperature = 0.9,
-            messages = new List<Message>
+            string url = "https://api.openai.com/v1/chat/completions";
+
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {PowerKeyVault.GetInstance().GetKeyVaultSecret("OpenApiKey")}");
+
+            var requestBody = new OpenAIPromptRequest
+            {
+                model = "gpt-3.5-turbo",
+                temperature = 0.9,
+                messages = new List<Message>
             {
                 new Message
                 {
@@ -33,18 +35,23 @@ public class OpenAI
                     content = query
                 }
             }
-        };
+            };
 
-        var json     = JsonSerializer.Serialize(requestBody);
-        var content  = new StringContent(json, Encoding.UTF8, "application/json");
-        var response = await client.PostAsync(url, content);
-        var responseContent = await response.Content.ReadFromJsonAsync<OpenAIPromptResponse>();
+            var json = JsonSerializer.Serialize(requestBody);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await client.PostAsync(url, content);
+            var responseContent = await response.Content.ReadFromJsonAsync<OpenAIPromptResponse>();
 
-        if (responseContent == null || responseContent.choices is null)
-        {
-            return "Não entendi, pode repetir?";
+            if (responseContent == null || responseContent.choices is null)
+            {
+                return "Não entendi, pode repetir?";
+            }
+
+            return responseContent.choices[0].message?.content ?? "Não entendi, pode repetir?";
         }
-
-        return responseContent.choices[0].message?.content ?? "Não entendi, pode repetir?";
+        catch (Exception ex)
+        {
+            return ex.ToString();
+        }
     }
 }
