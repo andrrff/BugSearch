@@ -25,6 +25,7 @@ env:
         BugSearch.Shared/Manifests/MongoDB/mongodb-secrets.yaml
         BugSearch.Shared/Manifests/MongoExpress/mongoexpress-deployment.yaml
         BugSearch.Shared/Manifests/MongoExpress/mongoexpress-service.yaml
+        BugSearch.Shared/Manifests/AAD/aad-secrets.yaml
 jobs:
     buildImage:
         permissions:

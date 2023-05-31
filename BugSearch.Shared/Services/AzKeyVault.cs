@@ -30,23 +30,17 @@ public class PowerKeyVault
     }
 
     private static PowerKeyVault Construct() =>
+
         new PowerKeyVault
         {
             client = new SecretClient(
                 new Uri("https://bugsearch.vault.azure.net/"),
-                new DefaultAzureCredential(),
-                //new InteractiveBrowserCredential(),
-                new SecretClientOptions
-                {
-                    Retry =
-                    {
-                        Delay      = TimeSpan.FromSeconds(2),
-                        MaxDelay   = TimeSpan.FromSeconds(16),
-                        MaxRetries = 5,
-                        Mode       = Azure.Core.RetryMode.Exponential
-                    }
-                }
-            )
+                new ClientSecretCredential(
+                    KubernetesClient.GetKubernetesSecret("aad-creds","tenantid"),
+                    KubernetesClient.GetKubernetesSecret("aad-creds","clientid"),
+                    KubernetesClient.GetKubernetesSecret("aad-creds","clientsecret"))
+                    ),
+                // new InteractiveBrowserCredential()
         };
 
     public async Task<KeyVaultSecret> GetKeyVaultSecretAsync(string name) => await client.GetSecretAsync(name);
