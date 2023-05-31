@@ -1,8 +1,7 @@
-name: bugsearchcrawler-service
+name: bugsearchshared-service
 "on":
     push:
         paths:
-            - 'BugSearch.Crawler/**'
             - 'BugSearch.Shared/**'
         branches:
             - master
@@ -10,29 +9,22 @@ name: bugsearchcrawler-service
 env:
     ACR_RESOURCE_GROUP: ifma-crawler
     AZURE_CONTAINER_REGISTRY: acrworkflow1684607545542
-    CLUSTER_NAME: CrawlerBot
+    CLUSTER_NAME: BugSearch
     CLUSTER_RESOURCE_GROUP: ifma-crawler
-    CONTAINER_NAME: bugsearchcrawler
     DEPLOYMENT_MANIFEST_PATH: |
-        BugSearch.Crawler/Manifests/bugsearchcrawler-deployment.yaml
-        BugSearch.Crawler/Manifests/bugsearchcrawler-namespace.yaml
-        BugSearch.Crawler/Manifests/bugsearchcrawler-service.yaml
+        BugSearch.Shared/Manifests/RabbitMQ/rabbitmq-cluster.yaml
+        BugSearch.Shared/Manifests/RabbitMQ/rabbitmq-deployment.yaml
+        BugSearch.Shared/Manifests/RabbitMQ/rabbitmq-pvc.yaml
+        BugSearch.Shared/Manifests/RabbitMQ/rabbitmq-service.yaml
+        BugSearch.Shared/Manifests/MongoDB/mongodb-configmap.yaml
+        BugSearch.Shared/Manifests/MongoDB/mongodb-deployment.yaml
+        BugSearch.Shared/Manifests/MongoDB/mongodb-service.yaml
+        BugSearch.Shared/Manifests/MongoDB/mongodb-pv.yaml
+        BugSearch.Shared/Manifests/MongoDB/mongodb-pvc.yaml
+        BugSearch.Shared/Manifests/MongoDB/mongodb-secrets.yaml
+        BugSearch.Shared/Manifests/MongoExpress/mongoexpress-deployment.yaml
+        BugSearch.Shared/Manifests/MongoExpress/mongoexpress-service.yaml
 jobs:
-    buildImage:
-        permissions:
-            contents: read
-            id-token: write
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v3
-            - uses: azure/login@v1.4.3
-              name: Azure login
-              with:
-                client-id: ${{ secrets.AZURE_CLIENT_ID }}
-                subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-                tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-            - name: Build and push image to ACR
-              run: az acr build --image ${{ env.CONTAINER_NAME }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f BugSearch.Crawler/Dockerfile .
     deploy:
         permissions:
             actions: read
@@ -64,6 +56,5 @@ jobs:
               name: Deploys application (Crawler-Bot)
               with:
                 action: deploy
-                images: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_NAME }}:${{ github.sha }}
                 manifests: ${{ env.DEPLOYMENT_MANIFEST_PATH }}
                 namespace: crawler-bot
