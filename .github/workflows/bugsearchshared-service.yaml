@@ -1,9 +1,6 @@
 name: bugsearchshared-service
 "on":
     push:
-        paths:
-            - 'BugSearch.Crawler/**'
-            - 'BugSearch.Shared/**'
         branches:
             - master
     workflow_dispatch: {}
@@ -12,20 +9,10 @@ env:
     AZURE_CONTAINER_REGISTRY: acrworkflow1684607545542
     CLUSTER_NAME: BugSearch
     CLUSTER_RESOURCE_GROUP: ifma-crawler
+    CONTAINER_NAME: image-workflow-1685570291580
     DEPLOYMENT_MANIFEST_PATH: |
-        BugSearch.Shared/Manifests/RabbitMQ/rabbitmq-cluster.yaml
-        BugSearch.Shared/Manifests/RabbitMQ/rabbitmq-secrets.yaml
-        BugSearch.Shared/Manifests/RabbitMQ/rabbitmq-configmap.yaml
-        BugSearch.Shared/Manifests/MongoDB/mongodb-configmap.yaml
-        BugSearch.Shared/Manifests/MongoDB/mongodb-deployment.yaml
-        BugSearch.Shared/Manifests/MongoDB/mongodb-service.yaml
-        BugSearch.Shared/Manifests/MongoDB/mongodb-pv.yaml
-        BugSearch.Shared/Manifests/MongoDB/mongodb-pvc.yaml
-        BugSearch.Shared/Manifests/MongoDB/mongodb-secrets.yaml
-        BugSearch.Shared/Manifests/MongoExpress/mongoexpress-deployment.yaml
-        BugSearch.Shared/Manifests/MongoExpress/mongoexpress-service.yaml
-        BugSearch.Shared/Manifests/AAD/aad-secrets.yaml
-        BugSearch.Shared/Manifests/OpenAI/openai-secrets.yaml
+        manifests/deployment.yaml
+        manifests/service.yaml
 jobs:
     buildImage:
         permissions:
@@ -40,6 +27,8 @@ jobs:
                 client-id: ${{ secrets.AZURE_CLIENT_ID }}
                 subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
                 tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+            - name: Build and push image to ACR
+              run: az acr build --image ${{ env.CONTAINER_NAME }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f Dockerfile ./
     deploy:
         permissions:
             actions: read
@@ -68,8 +57,9 @@ jobs:
                 resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
                 use-kubelogin: "true"
             - uses: Azure/k8s-deploy@v4
-              name: Deploys application (Crawler-Bot)
+              name: Deploys application
               with:
                 action: deploy
+                images: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_NAME }}:${{ github.sha }}
                 manifests: ${{ env.DEPLOYMENT_MANIFEST_PATH }}
-                namespace: crawler-bot
+                namespace: namespace-workflow-1685570291580
