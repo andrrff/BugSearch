@@ -1,9 +1,6 @@
 name: bugsearchapi-service
 "on":
     push:
-        paths:
-            - 'BugSearch.Api/**'
-            - 'BugSearch.Shared/**'
         branches:
             - master
     workflow_dispatch: {}
@@ -12,11 +9,10 @@ env:
     AZURE_CONTAINER_REGISTRY: acrworkflow1684607545542
     CLUSTER_NAME: BugSearch
     CLUSTER_RESOURCE_GROUP: ifma-crawler
-    CONTAINER_NAME: bugsearchapi
+    CONTAINER_NAME: bugsearchapi01
     DEPLOYMENT_MANIFEST_PATH: |
-        BugSearch.Api/Manifests/bugsearchapi-deployment.yaml
-        BugSearch.Api/Manifests/bugsearchapi-namespace.yaml
-        BugSearch.Api/Manifests/bugsearchapi-service.yaml
+        manifests/deployment.yaml
+        manifests/service.yaml
 jobs:
     buildImage:
         permissions:
@@ -32,7 +28,7 @@ jobs:
                 subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
                 tenant-id: ${{ secrets.AZURE_TENANT_ID }}
             - name: Build and push image to ACR
-              run: az acr build --image ${{ env.CONTAINER_NAME }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f BugSearch.Api/Dockerfile .
+              run: az acr build --image ${{ env.CONTAINER_NAME }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f Dockerfile ./
     deploy:
         permissions:
             actions: read
@@ -61,7 +57,7 @@ jobs:
                 resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
                 use-kubelogin: "true"
             - uses: Azure/k8s-deploy@v4
-              name: Deploys application (BugSearch-Api V2)
+              name: Deploys application
               with:
                 action: deploy
                 images: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_NAME }}:${{ github.sha }}
