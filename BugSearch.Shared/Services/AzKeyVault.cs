@@ -34,8 +34,8 @@ public class PowerKeyVault
         {
             client = new SecretClient(
                 new Uri("https://bugsearch.vault.azure.net/"),
-                //new DefaultAzureCredential(),
-                new InteractiveBrowserCredential(),
+                new DefaultAzureCredential(),
+                //new InteractiveBrowserCredential(),
                 new SecretClientOptions
                 {
                     Retry =
