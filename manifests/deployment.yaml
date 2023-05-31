@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bugsearchapi-service
+  labels:
+    app: bugsearchapi-service
+  namespace: crawler-bot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bugsearchapi-service
+  template:
+    metadata:
+      labels:
+        app: bugsearchapi-service
+    spec:
+      containers:
+        - name: bugsearchapi-service
+          image: acrworkflow1684607545542.azurecr.io/bugsearchapi01:latest
+          ports:
+            - containerPort: 5000
