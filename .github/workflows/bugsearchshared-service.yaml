@@ -2,6 +2,7 @@ name: bugsearchshared-service
 "on":
     push:
         paths:
+            - 'BugSearch.Crawler/**'
             - 'BugSearch.Shared/**'
         branches:
             - master
@@ -26,10 +27,18 @@ env:
         BugSearch.Shared/Manifests/MongoExpress/mongoexpress-service.yaml
 jobs:
     buildImage:
+        permissions:
+            contents: read
+            id-token: write
         runs-on: ubuntu-latest
         steps:
-            - name: Build container image
-                run: echo "Building container image..."
+            - uses: actions/checkout@v3
+            - uses: azure/login@v1.4.3
+              name: Azure login
+              with:
+                client-id: ${{ secrets.AZURE_CLIENT_ID }}
+                subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+                tenant-id: ${{ secrets.AZURE_TENANT_ID }}
     deploy:
         permissions:
             actions: read
