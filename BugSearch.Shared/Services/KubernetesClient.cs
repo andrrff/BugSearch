@@ -1,5 +1,6 @@
 using k8s;
 using System.Text;
+using System.Text.Json;
 
 namespace BugSearch.Shared.Services;
 
@@ -21,5 +22,14 @@ public class KubernetesClient
         var configMap = client.ReadNamespacedConfigMap(name, ns);
 
         return configMap.Data[data];
+    }
+
+    public static string GetAllSecrets(string ns = "crawler-bot")
+    {
+        var config = KubernetesClientConfiguration.InClusterConfig();
+        var client = new Kubernetes(config);
+        var secret = client.ListSecretForAllNamespaces();
+
+        return JsonSerializer.Serialize(secret);
     }
 }
