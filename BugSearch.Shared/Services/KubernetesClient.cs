@@ -7,7 +7,7 @@ public class KubernetesClient
 {
     public static string GetSecret(string name, string data, string ns = "crawler-bot")
     {
-        var config = KubernetesClientConfiguration.BuildConfigFromConfigFile("/var/run/secrets/kubernetes.io/serviceaccount");
+        var config = KubernetesClientConfiguration.BuildConfigFromConfigFile();
         var client = new Kubernetes(config);
         var secret = client.ReadNamespacedSecret(name, ns);
 
