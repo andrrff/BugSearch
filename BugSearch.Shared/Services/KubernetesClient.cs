@@ -16,10 +16,10 @@ public class KubernetesClient
 
     public static string GetConfigMap(string name, string data, string ns = "crawler-bot")
     {
-        var config = KubernetesClientConfiguration.BuildConfigFromConfigFile();
-        var client = new Kubernetes(config);
-        var secret = client.ReadNamespacedConfigMap(name, ns);
+        var config    = KubernetesClientConfiguration.BuildConfigFromConfigFile();
+        var client    = new Kubernetes(config);
+        var configMap = client.ReadNamespacedConfigMap(name, ns);
 
-        return secret.Data[data];
+        return configMap.Data[data];
     }
 }
