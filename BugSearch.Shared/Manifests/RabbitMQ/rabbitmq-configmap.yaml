@@ -5,5 +5,5 @@ metadata:
   name: rabbitmq-configmap
 data:
   hostname: rabbitmq-bugsearch.eastus.cloudapp.azure.com
-  port: 5672
+  port: "5672"
   exchange: BugSearch
