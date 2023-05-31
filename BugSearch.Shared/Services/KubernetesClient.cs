@@ -7,7 +7,7 @@ public class KubernetesClient
 {
     public static string GetSecret(string name, string data, string ns = "crawler-bot")
     {
-        var config = KubernetesClientConfiguration.BuildConfigFromConfigFile();
+        var config = KubernetesClientConfiguration.InClusterConfig();
         var client = new Kubernetes(config);
         var secret = client.ReadNamespacedSecret(name, ns);
 
@@ -16,7 +16,7 @@ public class KubernetesClient
 
     public static string GetConfigMap(string name, string data, string ns = "crawler-bot")
     {
-        var config    = KubernetesClientConfiguration.BuildConfigFromConfigFile();
+        var config    = KubernetesClientConfiguration.InClusterConfig();
         var client    = new Kubernetes(config);
         var configMap = client.ReadNamespacedConfigMap(name, ns);
 
