@@ -1,4 +1,13 @@
-# BugSearch
+<p align="center">
+  <img src="https://github.com/andrrff/BugSearch/assets/13167954/e6fdc0e7-1a8a-4d64-8b69-8d0379022b86" style="width: 300px;" alt="BugSearch drawio">
+  <h1>BugSearch</h1>
+</p>
+
+[![bugsearchshared-service](https://github.com/andrrff/BugSearch/actions/workflows/bugsearchshared-service.yaml/badge.svg)](https://github.com/andrrff/BugSearch/actions/workflows/bugsearchshared-service.yaml)
+[![bugsearchcrawler-service](https://github.com/andrrff/BugSearch/actions/workflows/bugsearchcrawler-service.yaml/badge.svg)](https://github.com/andrrff/BugSearch/actions/workflows/bugsearchcrawler-service.yaml)
+[![bugsearchapi-service](https://github.com/andrrff/BugSearch/actions/workflows/bugsearchapi-service.yaml/badge.svg?branch=master)](https://github.com/andrrff/BugSearch/actions/workflows/bugsearchapi-service.yaml)
+
+---
 
 BugSearch é um motor de pesquisa de páginas indexadas pelo crawler BugSearch.Crawler. O projeto é dividido em duas partes: o lado do Bot (Bot side) e o lado do Cliente (Client side).
 
