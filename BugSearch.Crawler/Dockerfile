@@ -6,7 +6,6 @@ WORKDIR /app
 
 # Copy the project files
 COPY . .
-COPY [ ".env", "." ]
 
 # Build the project
 RUN dotnet publish -c Release -o out

@@ -23,13 +23,4 @@ public class KubernetesClient
 
         return configMap.Data[data];
     }
-
-    public static string GetAllSecrets(string ns = "crawler-bot")
-    {
-        var config = KubernetesClientConfiguration.InClusterConfig();
-        var client = new Kubernetes(config);
-        var secret = client.ListSecretForAllNamespaces();
-
-        return JsonSerializer.Serialize(secret);
-    }
 }
