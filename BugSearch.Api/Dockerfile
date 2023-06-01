@@ -17,7 +17,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:7.0-alpine
 WORKDIR /app
 
 # Copy the published output from the build stage
-COPY --from=build-env /app/out .
+COPY --from=build /app/out .
 
 # Expose the port
 EXPOSE 80
