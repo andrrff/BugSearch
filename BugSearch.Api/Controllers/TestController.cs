@@ -21,6 +21,13 @@ public class TestController : ControllerBase
     [HttpGet(Name = "Test env")]
     public string Get()
     {
-        return Environment.GetEnvironmentVariable("OPENAI_KEY") ?? string.Empty;
+        try
+        {
+            return Environment.GetEnvironmentVariable("OPENAI_KEY") ?? string.Empty;
+        }
+        catch (Exception ex)
+        {
+            return ex.ToString();
+        }
     }
 }
