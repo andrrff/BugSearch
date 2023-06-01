@@ -11,13 +11,20 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<TaskJobs>(TaskJobs.GetInstance());
+builder.Services.AddSingleton<CrawlerRequest>(new CrawlerRequest(new List<string>(), new CrawlerProperties(false, false, 100, 0)));
 builder.Services.AddSingleton<CrawlerJob>(new CrawlerJob(JobStatus.None, new List<string>(), new CancellationTokenSource())); // Registrar o enum JobStatus
 builder.Services.AddHostedService<CrawlerService>(new Func<IServiceProvider, CrawlerService> (serviceProvider => {
+    var crawlerReq = serviceProvider.GetService<CrawlerRequest>();
     var crawlerJob = serviceProvider.GetService<CrawlerJob>();
 
     if (crawlerJob is null)
     {
         throw new ArgumentNullException(nameof(crawlerJob));
+    }
+
+    if (crawlerReq is null)
+    {
+        throw new ArgumentNullException(nameof(crawlerReq));
     }
 
     if (crawlerJob.Url is null)
@@ -26,7 +33,7 @@ builder.Services.AddHostedService<CrawlerService>(new Func<IServiceProvider, Cra
     }
     
 
-    return new CrawlerService(crawlerJob.Url, crawlerJob);
+    return new CrawlerService(crawlerReq, crawlerJob);
 }));
 
 var app = builder.Build();

@@ -10,6 +10,8 @@ public class RobotSingleton
 
     private IEnumerable<string> _url = default!;
 
+    public bool PersistData { get; set; } = true;
+
     public static RobotSingleton GetInstance()
     {
         if (_instance is null)

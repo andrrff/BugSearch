@@ -5,13 +5,13 @@ namespace BugSearch.Crawler.Services
 {
     public class CrawlerService : BackgroundService
     {
-        private readonly IEnumerable<string> _urls;
+        private readonly CrawlerRequest _req;
         private readonly CrawlerJob _jobTask;
         private readonly CancellationToken _cancellationToken;
 
-        public CrawlerService(IEnumerable<string> urls, CrawlerJob jobTask)
+        public CrawlerService(CrawlerRequest req, CrawlerJob jobTask)
         {
-            _urls              = urls ?? throw new ArgumentNullException(nameof(urls));
+            _req               = req ?? throw new ArgumentNullException(nameof(req));
             _jobTask           = jobTask ?? throw new ArgumentNullException(nameof(jobTask));
             _cancellationToken = jobTask.CancellationTokenSource.Token;
         }
@@ -27,8 +27,18 @@ namespace BugSearch.Crawler.Services
 
             try
             {
-                RobotSingleton.GetInstance().SetUrls(_urls);
-                await DistributedSpider.RunAsync(stoppingToken);
+                RobotSingleton.GetInstance().SetUrls(_req.Urls);
+                RobotSingleton.GetInstance().PersistData = _req.Properties.PersistData;
+                _jobTask.Message = "O trabalho está sendo executado.";
+
+                if(_req.Properties.UseMessageQueue)
+                {
+                    await DistributedSpider.RunAsync(stoppingToken, _req.Properties.Speed, _req.Properties.Depth);
+                }
+                else
+                {
+                    await RobotSpider.RunAsync(stoppingToken, _req.Properties.Speed, _req.Properties.Depth);
+                }
                 _jobTask.Status = JobStatus.Completed;
             }
             catch (OperationCanceledException)

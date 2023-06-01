@@ -17,18 +17,20 @@ public class RobotSpider : Spider
     {
     }
 
-    public static async Task RunAsync()
+    public static async Task RunAsync(CancellationToken cancellationToken = default, int speed = 100, int depth = 0)
     {
-        var builder = Builder.CreateDefaultBuilder<RobotSpider>(x =>
+        var builder = Builder.CreateDefaultBuilder<RobotSpider>(options =>
         {
-            x.Speed = 100;
+            options.Speed = 100;
+
+            if (depth > 0) options.Depth = depth;
         });
 
         builder.IgnoreServerCertificateError();
         builder.UseDownloader<HttpClientDownloader>();
         builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
 
-        await builder.Build().RunAsync();
+        await builder.Build().RunAsync(cancellationToken);
     }
 
     protected override async Task InitializeAsync(CancellationToken stoppingToken)
@@ -45,8 +47,9 @@ public class RobotSpider : Spider
                 }));
         }, stoppingToken);
 
+        if (RobotSingleton.GetInstance().PersistData) AddDataFlow(new Persistence());
+
         AddDataFlow(new EventCrawlerParser());
-        AddDataFlow(new Persistence());
         AddDataFlow(new ConsoleStorage());
     }
 
