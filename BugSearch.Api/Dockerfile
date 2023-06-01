@@ -7,9 +7,6 @@ WORKDIR /app
 # Copy the project files
 COPY . .
 
-# Copy the .env file
-COPY .env .
-
 # Build the project
 RUN dotnet publish -c Release -o out
 
@@ -20,7 +17,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:7.0-alpine
 WORKDIR /app
 
 # Copy the published output from the build stage
-COPY --from=build /app/out .
+COPY --from=build-env /app/out .
 
 # Expose the port
 EXPOSE 80
