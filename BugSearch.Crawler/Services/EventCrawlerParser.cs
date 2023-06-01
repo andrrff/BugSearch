@@ -18,7 +18,7 @@ class EventCrawlerParser : DataParser
             var body        =  Regex.Replace(context.Selectable.XPath(".//body").Value, "[^a-zA-Z]+", " ");
             var terms       =  body.Split(" ", StringSplitOptions.RemoveEmptyEntries).Distinct().Select(term => term.ToLower()).Where(term => term.Length > 2).ToArray();
 
-            if (!string.IsNullOrEmpty(title) || !string.IsNullOrEmpty(body))
+            if (!string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(body))
             {
                 context.AddData(typeName, new EventCrawler
                 {
