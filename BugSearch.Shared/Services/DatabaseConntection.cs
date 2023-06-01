@@ -11,13 +11,13 @@ public class DatabaseConntection
 
     public DatabaseConntection()
     {
-        var url      = EnvironmentService.GetValue("MONGO_DATABASE_URL");
-        var username = EnvironmentService.GetValue("MONGO_USERNAME");
-        var password = EnvironmentService.GetValue("MONGO_PASSWORD");
+        var url      = Environment.GetEnvironmentVariable("MONGO_DATABASE_URL");
+        var username = Environment.GetEnvironmentVariable("MONGO_USERNAME");
+        var password = Environment.GetEnvironmentVariable("MONGO_PASSWORD");
 
-        var databaseName               = EnvironmentService.GetValue("MONGO_DATABASE");
-        var collectionDictionaryName   = EnvironmentService.GetValue("MONGO_COLLECTION_DICTIONARY");
-        var collectionEventCrawlerName = EnvironmentService.GetValue("MONGO_COLLECTION_EVENT_CRAWLER");
+        var databaseName               = Environment.GetEnvironmentVariable("MONGO_DATABASE");
+        var collectionDictionaryName   = Environment.GetEnvironmentVariable("MONGO_COLLECTION_DICTIONARY");
+        var collectionEventCrawlerName = Environment.GetEnvironmentVariable("MONGO_COLLECTION_EVENT_CRAWLER");
 
         var connectionUri = $"mongodb://{username}:{password}@{url}/admin";
 

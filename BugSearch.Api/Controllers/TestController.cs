@@ -23,7 +23,7 @@ public class TestController : ControllerBase
     {
         try
         {
-            return Environment.GetEnvironmentVariable("OPENAI_KEY");
+            return Environment.GetEnvironmentVariable("OPENAI_KEY") ?? string.Empty;
         }
         catch (Exception ex)
         {

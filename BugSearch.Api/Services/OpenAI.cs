@@ -16,7 +16,7 @@ public class OpenAI
             string url = "https://api.openai.com/v1/chat/completions";
 
             client.DefaultRequestHeaders.Clear();
-            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {EnvironmentService.GetValue("OPENAI_KEY")}");
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {Environment.GetEnvironmentVariable("OPENAI_KEY")}");
 
             var requestBody = new OpenAIPromptRequest
             {

@@ -18,11 +18,11 @@ public class DistributedSpider
 
         builder.UseRabbitMQ(new Action<RabbitMQOptions> (options =>
         {
-            options.HostName = EnvironmentService.GetValue("RABBITMQ_HOSTNAME");
-            options.Port     = int.Parse(EnvironmentService.GetValue("RABBITMQ_PORT"));
-            options.UserName = EnvironmentService.GetValue("RABBITMQ_USERNAME");
-            options.Password = EnvironmentService.GetValue("RABBITMQ_PASSWORD");
-            options.Exchange = EnvironmentService.GetValue("RABBITMQ_EXCHANGE");
+            options.HostName = Environment.GetEnvironmentVariable("RABBITMQ_HOSTNAME");
+            options.Port     = int.Parse(Environment.GetEnvironmentVariable("RABBITMQ_PORT") ?? "0");
+            options.UserName = Environment.GetEnvironmentVariable("RABBITMQ_USERNAME");
+            options.Password = Environment.GetEnvironmentVariable("RABBITMQ_PASSWORD");
+            options.Exchange = Environment.GetEnvironmentVariable("RABBITMQ_EXCHANGE");
         }));
         builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();
         await builder.Build().RunAsync();
