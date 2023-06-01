@@ -15,18 +15,21 @@ class EventCrawlerParser : DataParser
             var title       =  context.Selectable.XPath(".//title")?.Value;
             var favicon     =  context.Selectable.XPath(".//link[@rel='icon']")?.Value;
             var description =  context.Selectable.XPath(".//meta[@name='description']")?.Value ?? string.Empty;
-            var body        =  Regex.Unescape(Regex.Replace(context.Selectable.XPath(".//body").Value, @"\s+", " ").Trim());
+            var body        =  Regex.Replace(Regex.Replace(Regex.Unescape(Regex.Replace(Regex.Replace(context.Selectable.XPath(".//body").Value, @"\s+", " ").Trim(), @"\W+", "")), @"(\B[A-Z])", " $1"), @"([a-z])([A-Z])", "$1 $2");
             var terms       =  body.Split(" ").Distinct().Select(term => term.ToLower()).ToArray();
 
-            context.AddData(typeName, new EventCrawler
+            if (!string.IsNullOrEmpty(title) || string.IsNullOrEmpty(body))
             {
-                Url         = url.ToString(),
-                Title       = title,
-                Favicon     = favicon,
-                Description = description,
-                Body        = body,
-                Terms       = terms
-            });
+                context.AddData(typeName, new EventCrawler
+                {
+                    Url         = url.ToString(),
+                    Title       = title,
+                    Favicon     = favicon,
+                    Description = description,
+                    Body        = body,
+                    Terms       = terms
+                });
+            }
 
             return Task.CompletedTask;
         }
