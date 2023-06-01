@@ -40,7 +40,7 @@ namespace BugSearch.Crawler.Controllers
             return new JsonResult(spiderList);
         }
 
-        [HttpGet("task/{jobId}/status", Name = "GetJobStatus")]
+        [HttpGet("task/{jobId}/", Name = "GetJobStatus")]
         public IActionResult GetJobStatus(string jobId)
         {
             var jobTask = TaskJobs.GetInstance().GetJob(jobId);
