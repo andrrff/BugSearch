@@ -3,7 +3,6 @@ name: bugsearchapi-service
     push:
         paths:
             - 'BugSearch.Api/**'
-            - 'BugSearch.Shared/**'
         branches:
             - master
     workflow_dispatch: {}

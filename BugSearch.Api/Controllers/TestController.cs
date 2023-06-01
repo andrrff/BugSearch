@@ -10,12 +10,12 @@ public class TestController : ControllerBase
 {
     private readonly ILogger<TestController> _logger;
 
-    private readonly DatabaseConntection _context;
+    // private readonly DatabaseConntection _context;
 
     public TestController(ILogger<TestController> logger)
     {
         _logger = logger;
-        _context = new DatabaseConntection();
+        // _context = new DatabaseConntection();
     }
 
     [HttpGet(Name = "Test env")]
@@ -23,7 +23,7 @@ public class TestController : ControllerBase
     {
         try
         {
-            return Environment.GetEnvironmentVariable("OPENAI_KEY") ?? string.Empty;
+            return Environment.GetEnvironmentVariable("OPENAI_KEY");
         }
         catch (Exception ex)
         {
