@@ -6,7 +6,9 @@ WORKDIR /app
 
 # Copy the project files
 COPY . .
-COPY ./.env .
+
+# Copy the .env file
+COPY .env .
 
 # Build the project
 RUN dotnet publish -c Release -o out
@@ -19,7 +21,6 @@ WORKDIR /app
 
 # Copy the published output from the build stage
 COPY --from=build /app/out .
-COPY --from=build /app/.env .
 
 # Expose the port
 EXPOSE 80
