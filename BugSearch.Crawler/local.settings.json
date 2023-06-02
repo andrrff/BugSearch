@@ -6,11 +6,11 @@
     "RABBITMQ_EXCHANGE": "BugSearch",
     "RABBITMQ_USERNAME": "guest",
     "RABBITMQ_PASSWORD": "guest",
-    "MONGO_USERNAME": "<MONGO_USERNAME>",
-    "MONGO_PASSWORD": "<MONGO_PASSWORD>",
+    "MONGO_USERNAME": "admin",
+    "MONGO_PASSWORD": "senha_admin",
     "MONGO_DATABASE_URL": "localhost:27017",
     "MONGO_DATABASE": "BugSearchDBV2",
-    "MONGO_COLLECTION_DICTIONARY": "eventcrawler",
-    "MONGO_COLLECTION_EVENT_CRAWLER": "dictionary"
+    "MONGO_COLLECTION_DICTIONARY": "dictionary",
+    "MONGO_COLLECTION_EVENT_CRAWLER": "eventcrawler"
   }
 }

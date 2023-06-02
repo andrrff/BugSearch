@@ -5,7 +5,7 @@ namespace BugSearch.Shared.Models;
 public class CrawlerRequest
 {
     [JsonPropertyName("urls")]
-    public IEnumerable<string> Urls { get; set; }
+    public IEnumerable<string> Urls { get; set; } = default!;
 
     [JsonPropertyName("properties")]
     public CrawlerProperties Properties { get; set; }

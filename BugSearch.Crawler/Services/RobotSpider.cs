@@ -47,9 +47,11 @@ public class RobotSpider : Spider
                 }));
         }, stoppingToken);
 
-        if (RobotSingleton.GetInstance().PersistData) AddDataFlow(new Persistence());
-
         AddDataFlow(new EventCrawlerParser());
+
+        if (RobotSingleton.GetInstance().PersistData)
+            AddDataFlow(new Persistence());
+            
         AddDataFlow(new ConsoleStorage());
     }
 

@@ -15,7 +15,7 @@ class EventCrawlerParser : DataParser
             var title       =  context.Selectable.XPath(".//title")?.Value;
             var favicon     =  context.Selectable.XPath(".//link[@rel='icon']")?.Value;
             var description =  context.Selectable.XPath(".//meta[@name='description']")?.Value ?? string.Empty;
-            var body        =  Regex.Replace(context.Selectable.XPath(".//body").Value, "[^a-zA-Z]+", " ");
+            var body        =  Regex.Replace(context.Selectable.XPath(".//body").Value ?? string.Empty, "[^a-zA-Z]+", " ") ?? string.Empty;
             var terms       =  body.Split(" ", StringSplitOptions.RemoveEmptyEntries).Distinct().Select(term => term.ToLower()).Where(term => term.Length > 2).ToArray();
 
             if (!string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(body))

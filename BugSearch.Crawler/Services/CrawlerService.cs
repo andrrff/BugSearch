@@ -39,6 +39,7 @@ namespace BugSearch.Crawler.Services
                 {
                     await RobotSpider.RunAsync(stoppingToken, _req.Properties.Speed, _req.Properties.Depth);
                 }
+                
                 _jobTask.Status = JobStatus.Completed;
             }
             catch (OperationCanceledException)

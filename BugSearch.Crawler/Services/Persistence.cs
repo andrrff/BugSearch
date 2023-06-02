@@ -31,7 +31,7 @@ namespace BugSearch.Crawler.Services
 
             if (data is not null)
             {
-                await Task.Run(() => _context.InsertEventCrawler(data));;
+                await Task.Run(() => _context.InsertEventCrawler(data));
             }
         }
     }

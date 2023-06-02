@@ -107,6 +107,20 @@ Aqui estão os exemplos de uso em uma tabela:
 </p>
 
 
+## Docker
+
+MongoDB:
+
+```shell
+docker run -d -p 27017:27017 --name mongodb -e MONGO_INITDB_ROOT_USERNAME=admin -e MONGO_INITDB_ROOT_PASSWORD=senha_admin mongo:4.4.18
+```
+
+RabbitMQ:
+
+```shell
+docker run -d -p 5672:5672 -p 15672:15672 --name rabbitmq rabbitmq:3-management
+```
+
 ## Contribuindo
 
 Se você deseja contribuir com o projeto BugSearch, sinta-se à vontade para abrir issues e enviar pull requests no repositório do GitHub.

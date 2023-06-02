@@ -11,13 +11,13 @@ public class DatabaseConntection
 
     public DatabaseConntection()
     {
-        var url      = Environment.GetEnvironmentVariable("MONGO_DATABASE_URL");
-        var username = Environment.GetEnvironmentVariable("MONGO_USERNAME");
-        var password = Environment.GetEnvironmentVariable("MONGO_PASSWORD");
+        var url      = Environment.GetEnvironmentVariable("MONGO_DATABASE_URL") ?? "localhost:27017";
+        var username = Environment.GetEnvironmentVariable("MONGO_USERNAME") ?? "admin";
+        var password = Environment.GetEnvironmentVariable("MONGO_PASSWORD") ?? "senha_admin";
 
-        var databaseName               = Environment.GetEnvironmentVariable("MONGO_DATABASE");
-        var collectionDictionaryName   = Environment.GetEnvironmentVariable("MONGO_COLLECTION_DICTIONARY");
-        var collectionEventCrawlerName = Environment.GetEnvironmentVariable("MONGO_COLLECTION_EVENT_CRAWLER");
+        var databaseName               = Environment.GetEnvironmentVariable("MONGO_DATABASE") ?? "BugSearchDBV2";
+        var collectionDictionaryName   = Environment.GetEnvironmentVariable("MONGO_COLLECTION_DICTIONARY") ?? "dictionary";
+        var collectionEventCrawlerName = Environment.GetEnvironmentVariable("MONGO_COLLECTION_EVENT_CRAWLER") ?? "eventcrawler";
 
         var connectionUri = $"mongodb://{username}:{password}@{url}/admin";
 
@@ -47,11 +47,6 @@ public class DatabaseConntection
             eventCrawler,
             new ReplaceOptions { IsUpsert = true }
         );
-
-        if (eventCrawler.Terms is null)
-        {
-            return;
-        }
 
         eventCrawler.Terms.ToList().ForEach(term =>
         {
