@@ -46,12 +46,6 @@ public class DatabaseConntection
             new UpdateOptions { IsUpsert = true }
         );
 
-        _collectionEventCrawler.ReplaceOne(
-            Builders<EventCrawler>.Filter.Eq(x => x.Url, eventCrawler.Url),
-            eventCrawler,
-            new ReplaceOptions { IsUpsert = true }
-        );
-
         Parallel.ForEach(eventCrawler.Terms.ToList (), term => 
         {
             _collectionDictionary.UpdateOne(
