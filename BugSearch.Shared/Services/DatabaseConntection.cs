@@ -40,7 +40,11 @@ public class DatabaseConntection
 
     public void InsertEventCrawler(EventCrawler eventCrawler)
     {
-        _collectionEventCrawler.InsertOne(eventCrawler);
+        _collectionEventCrawler.UpdateOne(
+            Builders<EventCrawler>.Filter.Eq(x => x.Url, eventCrawler.Url),
+            Builders<EventCrawler>.Update.Set(x => x.Url, eventCrawler.Url),
+            new UpdateOptions { IsUpsert = true }
+        );
 
         _collectionEventCrawler.ReplaceOne(
             Builders<EventCrawler>.Filter.Eq(x => x.Url, eventCrawler.Url),
@@ -48,7 +52,7 @@ public class DatabaseConntection
             new ReplaceOptions { IsUpsert = true }
         );
 
-        eventCrawler.Terms.ToList().ForEach(term =>
+        Parallel.ForEach(eventCrawler.Terms.ToList (), term => 
         {
             _collectionDictionary.UpdateOne(
                 Builders<Dictionary>.Filter.Eq(x => x.Term, term),
