@@ -38,17 +38,17 @@ public class DatabaseConntection
         _collectionDictionary   = database.GetCollection<Dictionary>(collectionDictionaryName);
     }
 
-    public async Task InsertEventCrawlerAsync(EventCrawler eventCrawler)
+    public void InsertEventCrawler(EventCrawler eventCrawler)
     {
-        await _collectionEventCrawler.UpdateOneAsync(
+        _collectionEventCrawler.UpdateOne(
             Builders<EventCrawler>.Filter.Eq(x => x.Url, eventCrawler.Url),
             Builders<EventCrawler>.Update.Set(x => x.Url, eventCrawler.Url),
             new UpdateOptions { IsUpsert = true }
         );
 
-        Parallel.ForEach(eventCrawler.Terms.ToList(), async term => 
+        Parallel.ForEach(eventCrawler.Terms.ToList(), term => 
         {
-            await _collectionDictionary.UpdateOneAsync(
+            _collectionDictionary.UpdateOne(
                 Builders<Dictionary>.Filter.Eq(x => x.Term, term),
                 Builders<Dictionary>.Update.Set(x => x.Term, term),
                 new UpdateOptions { IsUpsert = true }

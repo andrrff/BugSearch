@@ -2,8 +2,7 @@ name: bugsearchshared-service
 "on":
     push:
         paths:
-            - 'BugSearch.Crawler/**'
-            - 'BugSearch.Shared/**'
+            - 'BugSearch.Shared/Manifests/**'
         branches:
             - master
     workflow_dispatch: {}
