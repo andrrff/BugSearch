@@ -22,7 +22,7 @@ public class RobotSpider : Spider
         var builder = Builder.CreateDefaultBuilder<RobotSpider>(options =>
         {
             options.Speed = 100;
-            options.Batch = 100;
+            options.Batch = 3;
 
             if (depth > 0) options.Depth = depth;
         });

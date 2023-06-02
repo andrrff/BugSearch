@@ -12,7 +12,7 @@ public class DistributedSpider
         var builder = Builder.CreateBuilder<RobotSpider>(options =>
         {
             options.Speed = 100;
-            options.Batch = 100;
+            options.Batch = 3;
             
             if (depth > 0) options.Depth = depth;
         });
