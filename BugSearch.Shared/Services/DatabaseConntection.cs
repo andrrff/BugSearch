@@ -42,7 +42,7 @@ public class DatabaseConntection
     {
         _collectionEventCrawler.UpdateOne(
             Builders<EventCrawler>.Filter.Eq(x => x.Url, eventCrawler.Url),
-            Builders<EventCrawler>.Update.Set(x => x.Url, eventCrawler.Url),
+            Builders<EventCrawler>.Update.Set(x => x, eventCrawler),
             new UpdateOptions { IsUpsert = true }
         );
 
