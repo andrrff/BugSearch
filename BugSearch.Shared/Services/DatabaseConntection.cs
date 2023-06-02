@@ -11,13 +11,13 @@ public class DatabaseConntection
 
     public DatabaseConntection()
     {
-        var url      = Environment.GetEnvironmentVariable("MONGO_DATABASE_URL") ?? "localhost:27017";
-        var username = Environment.GetEnvironmentVariable("MONGO_USERNAME") ?? "admin";
-        var password = Environment.GetEnvironmentVariable("MONGO_PASSWORD") ?? "senha_admin";
+        var url      = Environment.GetEnvironmentVariable("MONGO_DATABASE_URL");// ?? "localhost:27017";
+        var username = Environment.GetEnvironmentVariable("MONGO_USERNAME");// ?? "admin";
+        var password = Environment.GetEnvironmentVariable("MONGO_PASSWORD");// ?? "senha_admin";
 
-        var databaseName               = Environment.GetEnvironmentVariable("MONGO_DATABASE") ?? "BugSearchDBV2";
-        var collectionDictionaryName   = Environment.GetEnvironmentVariable("MONGO_COLLECTION_DICTIONARY") ?? "dictionary";
-        var collectionEventCrawlerName = Environment.GetEnvironmentVariable("MONGO_COLLECTION_EVENT_CRAWLER") ?? "eventcrawler";
+        var databaseName               = Environment.GetEnvironmentVariable("MONGO_DATABASE");// ?? "BugSearchDBV2";
+        var collectionDictionaryName   = Environment.GetEnvironmentVariable("MONGO_COLLECTION_DICTIONARY");// ?? "dictionary";
+        var collectionEventCrawlerName = Environment.GetEnvironmentVariable("MONGO_COLLECTION_EVENT_CRAWLER");// ?? "eventcrawler";
 
         var connectionUri = $"mongodb://{username}:{password}@{url}/admin";
 
@@ -74,32 +74,47 @@ public class DatabaseConntection
     {
         SearchResult result = new();
         List<string> terms = new();
+        query = query.ToLower();
 
         terms = Regex
             .Unescape(Regex.Replace(query, @"\s+", " ").Trim())
             .Split(" ")
             .Distinct()
+            .Where(term => query.Length > 3 ? term.Length > 2 : term.Length > 1)
             .ToList();
 
         Parallel.ForEach(terms, term => 
         {
+            term = term.ToLower();
+
             var collectionEvents = _collectionEventCrawler.Find(x => x.Terms.Contains(term.ToLower()) ||
-                                                                         (string.IsNullOrEmpty(x.Title) ||
-                                                                         x.Title.Contains(term)) ||
-                                                                         (string.IsNullOrEmpty(x.Url) ||
-                                                                         x.Url.Contains(term)))
+                                                                         (!string.IsNullOrEmpty(x.Title) &&
+                                                                         x.Title.ToLower().Contains(term)) ||
+                                                                         (!string.IsNullOrEmpty(x.Url) &&
+                                                                         x.Url.ToLower().Contains(term)) ||
+                                                                         (!string.IsNullOrEmpty(x.Description) &&
+                                                                         x.Description.ToLower().Contains(term)))
                                                               .Limit(limit)
                                                               .ToList();
 
             Parallel.ForEach(collectionEvents, x =>
             {
+                x.Pts = (string.IsNullOrEmpty(x.Title) ? 0 : (x.Title.ToLower().Contains(term)  ? 1 * term.Length * 30 : term.Length * -10)) +
+                        (string.IsNullOrEmpty(x.Title) ? 0 : (x.Title.ToLower().Contains(query) ? 1 * term.Length * 50 : term.Length * -5)) +
+                        (string.IsNullOrEmpty(x.Url)   ? 0 : (x.Url.ToLower().Contains(term)    ? 1 * term.Length * 15 : term.Length * -5)) +
+                        (string.IsNullOrEmpty(x.Url)   ? 0 : (x.Url.ToLower().Contains(query)   ? 1 * term.Length * 30 : term.Length * -2.5)) +
+                        (string.IsNullOrEmpty(x.Description) ? 0 : (x.Description.ToLower().Contains(term) ? 1 * term.Length * 40 : term.Length * -8)) +
+                        (string.IsNullOrEmpty(x.Description) ? 0 : (x.Description.ToLower().Contains(query) ? 1 * term.Length * 50 : term.Length * -10)) +
+                        (string.IsNullOrEmpty(x.Body)  ? 0 : (x.Body.ToLower().Contains(term)   ? 1 * term.Length *  5 : term.Length * -30)) +
+                        (string.IsNullOrEmpty(x.Body)  ? 0 : (x.Body.ToLower().Contains(query)  ? 1 * term.Length * 50 : term.Length * -1));
+
                 if (string.IsNullOrEmpty(x.Description))
                 {
                     x.Body ??= string.Empty;
 
                     var index = x.Body.IndexOf(term, StringComparison.OrdinalIgnoreCase);
                     var start = index - 150;
-                    var end = index + 150;
+                    var end   = index + 150;
 
                     if (start < 0)
                     {
@@ -113,13 +128,6 @@ public class DatabaseConntection
 
                     x.Description = x.Body[start..end];
                 }
-
-                x.Pts = (string.IsNullOrEmpty(x.Title) ? 0 : (x.Title.Contains(term)  ? 1 * term.Length * 30 : term.Length * -10)) +
-                        (string.IsNullOrEmpty(x.Title) ? 0 : (x.Title.Contains(query) ? 1 * term.Length * 50 : term.Length * -5)) +
-                        (string.IsNullOrEmpty(x.Url)   ? 0 : (x.Url.Contains(term)    ? 1 * term.Length * 15 : term.Length * -5) +
-                        (string.IsNullOrEmpty(x.Url)   ? 0 : (x.Url.Contains(query)   ? 1 * term.Length * 30 : term.Length * -2.5)) +
-                        (string.IsNullOrEmpty(x.Body)  ? 0 : (x.Body.Contains(term)   ? 1 * term.Length *  5 : term.Length * -30) +
-                        (string.IsNullOrEmpty(x.Body)  ? 0 : (x.Body.Contains(query)  ? 1 * term.Length * 50 : term.Length * -1))));
 
                 result.SearchResults.Add(new WebSiteInfo
                 {
