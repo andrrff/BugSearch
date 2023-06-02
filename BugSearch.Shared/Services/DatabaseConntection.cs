@@ -11,13 +11,13 @@ public class DatabaseConntection
 
     public DatabaseConntection()
     {
-        var url      = Environment.GetEnvironmentVariable("MONGO_DATABASE_URL");// ?? "localhost:27017";
-        var username = Environment.GetEnvironmentVariable("MONGO_USERNAME");// ?? "admin";
-        var password = Environment.GetEnvironmentVariable("MONGO_PASSWORD");// ?? "senha_admin";
+        var url      = Environment.GetEnvironmentVariable("MONGO_DATABASE_URL") ?? "localhost:27017";
+        var username = Environment.GetEnvironmentVariable("MONGO_USERNAME") ?? "admin";
+        var password = Environment.GetEnvironmentVariable("MONGO_PASSWORD") ?? "senha_admin";
 
-        var databaseName               = Environment.GetEnvironmentVariable("MONGO_DATABASE");// ?? "BugSearchDBV2";
-        var collectionDictionaryName   = Environment.GetEnvironmentVariable("MONGO_COLLECTION_DICTIONARY");// ?? "dictionary";
-        var collectionEventCrawlerName = Environment.GetEnvironmentVariable("MONGO_COLLECTION_EVENT_CRAWLER");// ?? "eventcrawler";
+        var databaseName               = Environment.GetEnvironmentVariable("MONGO_DATABASE") ?? "BugSearchDBV2";
+        var collectionDictionaryName   = Environment.GetEnvironmentVariable("MONGO_COLLECTION_DICTIONARY") ?? "dictionary";
+        var collectionEventCrawlerName = Environment.GetEnvironmentVariable("MONGO_COLLECTION_EVENT_CRAWLER") ?? "eventcrawler";
 
         var connectionUri = $"mongodb://{username}:{password}@{url}/admin";
 
@@ -38,17 +38,17 @@ public class DatabaseConntection
         _collectionDictionary   = database.GetCollection<Dictionary>(collectionDictionaryName);
     }
 
-    public void InsertEventCrawler(EventCrawler eventCrawler)
+    public async Task InsertEventCrawlerAsync(EventCrawler eventCrawler)
     {
-        _collectionEventCrawler.UpdateOne(
+        await _collectionEventCrawler.UpdateOneAsync(
             Builders<EventCrawler>.Filter.Eq(x => x.Url, eventCrawler.Url),
             Builders<EventCrawler>.Update.Set(x => x.Url, eventCrawler.Url),
             new UpdateOptions { IsUpsert = true }
         );
 
-        Parallel.ForEach(eventCrawler.Terms.ToList (), term => 
+        Parallel.ForEach(eventCrawler.Terms.ToList(), async term => 
         {
-            _collectionDictionary.UpdateOne(
+            await _collectionDictionary.UpdateOneAsync(
                 Builders<Dictionary>.Filter.Eq(x => x.Term, term),
                 Builders<Dictionary>.Update.Set(x => x.Term, term),
                 new UpdateOptions { IsUpsert = true }
