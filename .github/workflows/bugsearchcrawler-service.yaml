@@ -3,6 +3,10 @@ name: bugsearchcrawler-service
     push:
         paths:
             - 'BugSearch.Crawler/**'
+            - 'BugSearch.Shared/Services/**'
+            - 'BugSearch.Shared/Singletons/**'
+            - 'BugSearch.Shared/Interfaces/**'
+            - 'BugSearch.Shared/Enums/**'
         branches:
             - master
     workflow_dispatch: {}
