@@ -40,11 +40,8 @@ public class DatabaseConntection
 
     public void InsertEventCrawler(EventCrawler eventCrawler)
     {
-        _collectionEventCrawler.UpdateOne(
-            Builders<EventCrawler>.Filter.Eq(x => x.Url, eventCrawler.Url),
-            Builders<EventCrawler>.Update.Set(x => x, eventCrawler),
-            new UpdateOptions { IsUpsert = true }
-        );
+        _collectionEventCrawler.FindOneAndDelete(x => x.Url == eventCrawler.Url);
+        _collectionEventCrawler.InsertOne(eventCrawler);
 
         Parallel.ForEach(eventCrawler.Terms.ToList(), term => 
         {
@@ -138,7 +135,7 @@ public class DatabaseConntection
             });
         });
 
-        result.SearchResults = result.SearchResults.OrderByDescending(x => x.Pts).ToList();
+        result.SearchResults = result.SearchResults.OrderByDescending(x => x.Pts).DistinctBy(x => x.Title).ToList();
 
         return result;
     }
