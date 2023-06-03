@@ -18,8 +18,9 @@ public class SearchController : ControllerBase
     }
 
     [HttpGet(Name = "GetSearch")]
-    public SearchResult Get([FromQuery] string q, [FromQuery] int l = 20)
+    public SearchResult Get([FromQuery] string q, [FromQuery] int p = 1, [FromQuery] int m = 20)
     {
-        return _context.FindWebSites(q, l);
+        var result = _context.FindWebSites(q, p, m);
+        return result.GetPage(p, m);
     }
 }

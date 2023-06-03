@@ -10,6 +10,8 @@ public class EventCrawler : IWebSiteInfo
     [BsonRepresentation(BsonType.ObjectId)]
     public string? _id { get; set; } 
     
+    public string? Name { get; set; }
+    
     public string? Url { get; set; }
 
     public string? Favicon { get; set; }
@@ -17,6 +19,12 @@ public class EventCrawler : IWebSiteInfo
     public string? Title { get; set; }
 
     public string? Description { get; set; }
+    
+    public string? Type { get; set; }
+    
+    public string? Image { get; set; }
+    
+    public string? Locale { get; set; }
 
     public string? Body { get; set; }
 

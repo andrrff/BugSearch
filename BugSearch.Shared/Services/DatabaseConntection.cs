@@ -1,6 +1,8 @@
 using MongoDB.Driver;
 using BugSearch.Shared.Models;
 using System.Text.RegularExpressions;
+using System.Text;
+using System.Globalization;
 
 namespace BugSearch.Shared.Services;
 
@@ -65,11 +67,11 @@ public class DatabaseConntection
         return result;
     }
 
-    public SearchResult FindWebSites(string query, int limit)
+    public SearchResult FindWebSites(string query, int currentPage, int itemsPerPage = 20)
     {
         SearchResult result = new();
         List<string> terms = new();
-        query = query.ToLower();
+        query = NormalizeString(query);
 
         terms = Regex
             .Unescape(Regex.Replace(query, @"\s+", " ").Trim())
@@ -80,28 +82,30 @@ public class DatabaseConntection
 
         Parallel.ForEach(terms, term => 
         {
-            term = term.ToLower();
+            term = NormalizeString(term);
 
-            var collectionEvents = _collectionEventCrawler.Find(x => x.Terms.Contains(term.ToLower()) ||
-                                                                         (!string.IsNullOrEmpty(x.Title) &&
-                                                                         x.Title.ToLower().Contains(term)) ||
-                                                                         (!string.IsNullOrEmpty(x.Url) &&
-                                                                         x.Url.ToLower().Contains(term)) ||
-                                                                         (!string.IsNullOrEmpty(x.Description) &&
-                                                                         x.Description.ToLower().Contains(term)))
-                                                              .Limit(limit)
-                                                              .ToList();
+            var collectionEvents = _collectionEventCrawler.Find(x => true)
+                                                          .ToList()
+                                                          .FindAll(x => x.Terms.Contains(term.ToLower()) ||
+                                                            (!string.IsNullOrEmpty(x.Title) && NormalizeString(x.Title).Contains(NormalizeString(term))) ||
+                                                            (!string.IsNullOrEmpty(x.Url) && NormalizeString(x.Url).Contains(NormalizeString(term))) ||
+                                                            (!string.IsNullOrEmpty(x.Description) && NormalizeString(x.Description).Contains(NormalizeString(term))) ||
+                                                            (!string.IsNullOrEmpty(x.Name) && NormalizeString(x.Name).Contains(NormalizeString(term))))
+                                                          .ToList();
 
             Parallel.ForEach(collectionEvents, x =>
             {
-                x.Pts = (string.IsNullOrEmpty(x.Title) ? 0 : (x.Title.ToLower().Contains(term)  ? 1 * term.Length * 30 : term.Length * -10)) +
-                        (string.IsNullOrEmpty(x.Title) ? 0 : (x.Title.ToLower().Contains(query) ? 1 * term.Length * 50 : term.Length * -5)) +
-                        (string.IsNullOrEmpty(x.Url)   ? 0 : (x.Url.ToLower().Contains(term)    ? 1 * term.Length * 15 : term.Length * -5)) +
-                        (string.IsNullOrEmpty(x.Url)   ? 0 : (x.Url.ToLower().Contains(query)   ? 1 * term.Length * 30 : term.Length * -2.5)) +
-                        (string.IsNullOrEmpty(x.Description) ? 0 : (x.Description.ToLower().Contains(term) ? 1 * term.Length * 40 : term.Length * -8)) +
-                        (string.IsNullOrEmpty(x.Description) ? 0 : (x.Description.ToLower().Contains(query) ? 1 * term.Length * 50 : term.Length * -10)) +
-                        (string.IsNullOrEmpty(x.Body)  ? 0 : (x.Body.ToLower().Contains(term)   ? 1 * term.Length *  5 : term.Length * -30)) +
-                        (string.IsNullOrEmpty(x.Body)  ? 0 : (x.Body.ToLower().Contains(query)  ? 1 * term.Length * 50 : term.Length * -1));
+                x.Pts = (
+                        (string.IsNullOrEmpty(x.Name)  ? 0 : (NormalizeString(x.Name).Contains(term)   ? 1 * term.Length * 20 : term.Length * -0.1)) +
+                        (string.IsNullOrEmpty(x.Name)  ? 0 : (NormalizeString(x.Name).Contains(query)  ? 1 * term.Length * 30 : term.Length * -0.3)) +
+                        (string.IsNullOrEmpty(x.Description) ? 0 : (NormalizeString(x.Description).Contains(term) ? 1 * term.Length * 40 : term.Length * -8)) +
+                        (string.IsNullOrEmpty(x.Description) ? 0 : (NormalizeString(x.Description).Contains(query) ? 1 * term.Length * 50 : term.Length * -10)) +
+                        (string.IsNullOrEmpty(x.Url)   ? 0 : (NormalizeString(x.Url).Contains(term)    ? 1 * term.Length * 25 : term.Length * -5)) +
+                        (string.IsNullOrEmpty(x.Url)   ? 0 : (NormalizeString(x.Url).Contains(query)   ? 1 * term.Length * 30 : term.Length * -2.5)) +
+                        (string.IsNullOrEmpty(x.Title) ? 0 : (NormalizeString(x.Title).Contains(term)  ? 1 * term.Length * 60 : term.Length * -10)) +
+                        (string.IsNullOrEmpty(x.Title) ? 0 : (NormalizeString(x.Title).Contains(query) ? 1 * term.Length * 70 : term.Length * -5)) +
+                        (string.IsNullOrEmpty(x.Body)  ? 0 : (NormalizeString(x.Body).Contains(term)   ? 1 * term.Length * 10 : term.Length * -30)) +
+                        (string.IsNullOrEmpty(x.Body)  ? 0 : (NormalizeString(x.Body).Contains(query)  ? 1 * term.Length * 50 : term.Length * -1)));
 
                 if (string.IsNullOrEmpty(x.Description))
                 {
@@ -126,17 +130,43 @@ public class DatabaseConntection
 
                 result.SearchResults.Add(new WebSiteInfo
                 {
+                    Name        = x.Name,
                     Link        = x.Url,
                     Favicon     = x.Favicon,
                     Title       = x.Title,
                     Description = x.Description,
+                    Type        = x.Type,
+                    Image       = x.Image,
+                    Locale      = x.Locale,
                     Pts         = x.Pts
                 });
             });
         });
 
-        result.SearchResults = result.SearchResults.OrderByDescending(x => x.Pts).DistinctBy(x => x.Title).ToList();
+        result.SearchResults = result.SearchResults
+                                     .OrderByDescending(x => x.Pts)
+                                     .DistinctBy(x => x.Title)
+                                     .ToList();
 
         return result;
     }
+
+    private string NormalizeString(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+            return input;
+
+        string normalizedString = input.Normalize(NormalizationForm.FormD);
+        StringBuilder stringBuilder = new StringBuilder();
+
+        foreach (char c in normalizedString)
+        {
+            if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                stringBuilder.Append(c);
+        }
+
+        return stringBuilder.ToString().Normalize(NormalizationForm.FormC).ToLower();
+    }
+
+
 }
