@@ -76,3 +76,8 @@ spec:
                 secretKeyRef:
                   name: rabbitmq-creds
                   key: password
+            - name: SEQ_URL
+              valueFrom: 
+                configMapKeyRef:
+                  name: seq-configmap
+                  key: log_url

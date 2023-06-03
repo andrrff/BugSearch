@@ -5,6 +5,7 @@ namespace BugSearch.Shared.Models;
 
 public class WebSiteInfo : IWebSiteInfo
 {
+
     [JsonPropertyName("link")]
     public string? Link { get; set; }
     

@@ -25,6 +25,9 @@ env:
         BugSearch.Shared/Manifests/MongoExpress/mongoexpress-service.yaml
         BugSearch.Shared/Manifests/AAD/aad-secrets.yaml
         BugSearch.Shared/Manifests/OpenAI/openai-secrets.yaml
+        BugSearch.Shared/Manifests/Seq/seq-configmap.yaml
+        BugSearch.Shared/Manifests/Seq/seq-deployment.yaml
+        BugSearch.Shared/Manifests/Seq/seq-service.yaml
 jobs:
     buildImage:
         permissions:

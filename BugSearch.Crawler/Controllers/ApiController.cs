@@ -1,3 +1,4 @@
+using Serilog;
 using BugSearch.Shared.Enums;
 using BugSearch.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -22,43 +23,69 @@ namespace BugSearch.Crawler.Controllers
         [HttpPost("task/create", Name = "Spider")]
         public async Task<ActionResult<CrawlerJob>> PostAsync([FromBody] CrawlerRequest req)
         {
-            var jobTask        = new CrawlerJob(JobStatus.Waiting, req.Urls, new CancellationTokenSource());
-            var crawlerService = new CrawlerService(req, jobTask);
+            try
+            {
+                Log.Logger.Information("Spider: {Urls} (Crawler)", req.Urls);
+                var jobTask        = new CrawlerJob(JobStatus.Waiting, req.Urls, new CancellationTokenSource());
+                var crawlerService = new CrawlerService(req, jobTask);
 
-            TaskJobs.GetInstance().AddJob(jobTask);
-            await crawlerService.StartAsync(jobTask.CancellationTokenSource.Token);
+                TaskJobs.GetInstance().AddJob(jobTask);
+                await crawlerService.StartAsync(jobTask.CancellationTokenSource.Token);
 
-            return new JsonResult(jobTask);
+                return new JsonResult(jobTask);
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, "Error on Spider (Crawler)");
+            }
+
+            return new JsonResult(CrawlerJob.NotFound());
         }
 
 
         [HttpGet("task/list", Name = "GetSpiderList")]
         public ActionResult<IEnumerable<CrawlerJob>> GetSpiderList()
         {
-            var spiderList = TaskJobs.GetInstance().GetJobs();
+            try
+            {
+                var spiderList = TaskJobs.GetInstance().GetJobs();
 
-            return new JsonResult(spiderList);
+                return new JsonResult(spiderList);
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, "Error on GetSpiderList");
+            }
+
+            return new JsonResult(new List<CrawlerJob>());
         }
 
         [HttpGet("task/{jobId}/", Name = "GetJobStatus")]
         public ActionResult<CrawlerJob> GetJobStatus(string jobId)
         {
-            var jobTask = TaskJobs.GetInstance().GetJob(jobId);
-
-            if (jobTask is not default(CrawlerJob))
+            try
             {
-                var isRunning = !jobTask.CancellationTokenSource.Token.IsCancellationRequested;
+                var jobTask = TaskJobs.GetInstance().GetJob(jobId);
 
-                if (isRunning)
+                if (jobTask is not default(CrawlerJob))
                 {
-                    jobTask.Status = JobStatus.Running;
-                    TaskJobs.GetInstance().UpdateJob(jobTask);
-                    return new JsonResult(jobTask);
+                    var isRunning = !jobTask.CancellationTokenSource.Token.IsCancellationRequested;
+
+                    if (isRunning)
+                    {
+                        jobTask.Status = JobStatus.Running;
+                        TaskJobs.GetInstance().UpdateJob(jobTask);
+                        return new JsonResult(jobTask);
+                    }
+                    else
+                    {
+                        return new JsonResult(jobTask);
+                    }
                 }
-                else
-                {
-                    return new JsonResult(jobTask);
-                }
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, "{jobId} - Error on GetJobStatus (Crawler)", jobId);
             }
 
             return new JsonResult(CrawlerJob.NotFound());
@@ -67,22 +94,29 @@ namespace BugSearch.Crawler.Controllers
         [HttpPost("task/{jobId}/cancel", Name = "CancelJob")]
         public ActionResult<CrawlerJob> CancelJob(string jobId)
         {
-            var jobTask = TaskJobs.GetInstance().GetJob(jobId);
-
-            if (jobTask is not default(CrawlerJob))
+            try
             {
-                var cancellationTokenSource = jobTask.CancellationTokenSource;
+                var jobTask = TaskJobs.GetInstance().GetJob(jobId);
 
-                if (!cancellationTokenSource.Token.IsCancellationRequested)
+                if (jobTask is not default(CrawlerJob))
                 {
-                    cancellationTokenSource.Cancel();
+                    var cancellationTokenSource = jobTask.CancellationTokenSource;
 
-                    jobTask.Status  = JobStatus.Canceled;
-                    jobTask.Message = "O trabalho foi cancelado com sucesso.";
-                    TaskJobs.GetInstance().UpdateJob(jobTask);
-                    
-                    return new JsonResult(jobTask);
+                    if (!cancellationTokenSource.Token.IsCancellationRequested)
+                    {
+                        cancellationTokenSource.Cancel();
+
+                        jobTask.Status = JobStatus.Canceled;
+                        jobTask.Message = "O trabalho foi cancelado com sucesso.";
+                        TaskJobs.GetInstance().UpdateJob(jobTask);
+
+                        return new JsonResult(jobTask);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, "{jobId} - Error on CancelJob (Crawler)", jobId);
             }
 
             return new JsonResult(CrawlerJob.NotFound());
@@ -91,23 +125,32 @@ namespace BugSearch.Crawler.Controllers
         [HttpPost("task/cancel", Name = "CancelJobs")]
         public ActionResult<IEnumerable<CrawlerJob>> CancelJobs()
         {
-            var jobTasks = TaskJobs.GetInstance().GetJobs();
-
-            foreach (var jobTask in jobTasks)
+            try
             {
-                var cancellationTokenSource = jobTask.CancellationTokenSource;
+                var jobTasks = TaskJobs.GetInstance().GetJobs();
 
-                if (!cancellationTokenSource.Token.IsCancellationRequested)
+                foreach (var jobTask in jobTasks)
                 {
-                    cancellationTokenSource.Cancel();
+                    var cancellationTokenSource = jobTask.CancellationTokenSource;
 
-                    jobTask.Status = JobStatus.Canceled;
-                    jobTask.Message = "O trabalho foi cancelado com sucesso.";
-                    TaskJobs.GetInstance().UpdateJob(jobTask);
+                    if (!cancellationTokenSource.Token.IsCancellationRequested)
+                    {
+                        cancellationTokenSource.Cancel();
+
+                        jobTask.Status = JobStatus.Canceled;
+                        jobTask.Message = "O trabalho foi cancelado com sucesso.";
+                        TaskJobs.GetInstance().UpdateJob(jobTask);
+                    }
                 }
+
+                return new JsonResult(jobTasks);
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, "Error on CancelJobs (Crawler)");
             }
 
-            return new JsonResult(jobTasks);
+            return new JsonResult(new List<CrawlerJob>());
         }
     }
 }

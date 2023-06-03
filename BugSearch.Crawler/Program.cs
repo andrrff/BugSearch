@@ -1,3 +1,5 @@
+using Serilog;
+using Serilog.Events;
 using BugSearch.Shared.Enums;
 using BugSearch.Shared.Models;
 using BugSearch.Crawler.Services;
@@ -32,10 +34,22 @@ builder.Services.AddHostedService<CrawlerService>(new Func<IServiceProvider, Cra
     {
         throw new ArgumentNullException(nameof(crawlerJob.Url));
     }
-    
-
     return new CrawlerService(crawlerReq, crawlerJob);
 }));
+
+int workerThreads, completionPortThreads;
+ThreadPool.GetMaxThreads(out workerThreads, out completionPortThreads);
+ThreadPool.SetMinThreads(workerThreads, completionPortThreads);
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .MinimumLevel.Override("System", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.AspNetCore.Authentication", LogEventLevel.Warning)
+    .Enrich.FromLogContext()
+    .WriteTo.Seq(Environment.GetEnvironmentVariable("SEQ_URL") ?? "http://localhost:5341")
+    .CreateLogger();
 
 var app = builder.Build();
 

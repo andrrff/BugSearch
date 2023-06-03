@@ -129,6 +129,12 @@ RabbitMQ:
 docker run -d -p 5672:5672 -p 15672:15672 --name rabbitmq rabbitmq:3-management
 ```
 
+Seq:
+
+```shell
+docker run -d --restart unless-stopped -p 5341:80 --name seq -e ACCEPT_EULA=Y datalust/seq:latest
+```
+
 ## Contribuindo
 
 Se você deseja contribuir com o projeto BugSearch, sinta-se à vontade para abrir issues e enviar pull requests no repositório do GitHub.

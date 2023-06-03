@@ -1,3 +1,4 @@
+using Serilog;
 using BugSearch.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using BugSearch.Shared.Services;
@@ -21,6 +22,16 @@ public class SummaryController : ControllerBase
     [HttpGet(Name = "GetSummary")]
     public SummaryResult Get()
     {
-        return _context.GetSummary();
+        try
+        {
+            Log.Logger.Information("GetSummary (API)");
+            return _context.GetSummary();
+        }
+        catch (Exception ex)
+        {
+            Log.Logger.Error(ex, "Error on GetSummary (API)");
+        }
+
+        return new SummaryResult();
     }
 }

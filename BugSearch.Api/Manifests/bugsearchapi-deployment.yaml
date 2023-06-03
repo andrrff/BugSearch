@@ -56,3 +56,8 @@ spec:
                 configMapKeyRef:
                   name: mongodb-configmap
                   key: collection_event_crawler
+            - name: SEQ_URL
+              valueFrom: 
+                configMapKeyRef:
+                  name: seq-configmap
+                  key: log_url

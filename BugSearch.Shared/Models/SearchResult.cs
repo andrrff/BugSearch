@@ -4,6 +4,18 @@ namespace BugSearch.Shared.Models;
  
 public class SearchResult
 {
+    public SearchResult()
+    {
+    }
+
+    public SearchResult(string id)
+    {
+        Id = id;
+    }
+
+    [JsonPropertyName("id")]
+    public string? Id { get; set; }
+
     [JsonPropertyName("searchResults")]
     public List<WebSiteInfo> SearchResults { get; set; } = new();
 

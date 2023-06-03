@@ -1,3 +1,4 @@
+using Serilog;
 using DotnetSpider;
 using DotnetSpider.Http;
 using DotnetSpider.DataFlow;
@@ -26,6 +27,7 @@ public class RobotSpider : Spider
             if (depth > 0) options.Depth = depth;
         });
 
+        builder.UseSerilog();
         builder.IgnoreServerCertificateError();
         builder.UseDownloader<HttpClientDownloader>();
         builder.UseQueueDistinctBfsScheduler<HashSetDuplicateRemover>();

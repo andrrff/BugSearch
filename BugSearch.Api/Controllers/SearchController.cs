@@ -1,3 +1,4 @@
+using Serilog;
 using BugSearch.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using BugSearch.Shared.Services;
@@ -20,7 +21,19 @@ public class SearchController : ControllerBase
     [HttpGet(Name = "GetSearch")]
     public SearchResult Get([FromQuery] string q, [FromQuery] int p = 1, [FromQuery] int m = 20)
     {
-        var result = _context.FindWebSites(q, p, m);
-        return result.GetPage(p, m);
+        var reqId = Guid.NewGuid().ToString();
+
+        try
+        {
+            Log.Logger.Information("{id} - GetSearch: {q}, {p}, {m} (API)", reqId, q, p, m);
+            var result = _context.FindWebSites(reqId, q, p, m);
+            return result.GetPage(p, m);
+        }
+        catch (Exception ex)
+        {
+            Log.Logger.Error(ex, $"{reqId} - Error on GetSearch (API)");
+        }
+        
+        return new SearchResult();
     }
 }
