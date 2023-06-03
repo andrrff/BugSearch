@@ -21,7 +21,7 @@ public class RobotSpider : Spider
     {
         var builder = Builder.CreateDefaultBuilder<RobotSpider>(options =>
         {
-            options.Speed = 100;
+            options.Speed = speed;
 
             if (depth > 0) options.Depth = depth;
         });

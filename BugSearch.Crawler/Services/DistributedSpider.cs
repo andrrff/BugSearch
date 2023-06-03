@@ -11,7 +11,7 @@ public class DistributedSpider
     {
         var builder = Builder.CreateBuilder<RobotSpider>(options =>
         {
-            options.Speed = 100;
+            options.Speed = speed;
             
             if (depth > 0) options.Depth = depth;
         });
@@ -19,7 +19,7 @@ public class DistributedSpider
         builder.UseRabbitMQ(new Action<RabbitMQOptions>(options =>
         {
             options.HostName = Environment.GetEnvironmentVariable("RABBITMQ_HOSTNAME");
-            options.Port = int.Parse(Environment.GetEnvironmentVariable("RABBITMQ_PORT") ?? "0");
+            options.Port     = int.Parse(Environment.GetEnvironmentVariable("RABBITMQ_PORT") ?? "0");
             options.UserName = Environment.GetEnvironmentVariable("RABBITMQ_USERNAME");
             options.Password = Environment.GetEnvironmentVariable("RABBITMQ_PASSWORD");
             options.Exchange = Environment.GetEnvironmentVariable("RABBITMQ_EXCHANGE");
