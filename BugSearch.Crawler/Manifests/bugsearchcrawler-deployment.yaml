@@ -6,7 +6,7 @@ metadata:
     app: bugsearchcrawler-service
   namespace: crawler-bot
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: bugsearchcrawler-service
@@ -20,13 +20,6 @@ spec:
           image: acrworkflow1684607545542.azurecr.io/bugsearchcrawler:latest
           ports:
             - containerPort: 80
-          resources:
-            requests:
-              cpu: 500m
-              memory: 1Gi
-            limits:
-              cpu: 3
-              memory: 2Gi
           env:
             - name: MONGO_USERNAME
               valueFrom:
