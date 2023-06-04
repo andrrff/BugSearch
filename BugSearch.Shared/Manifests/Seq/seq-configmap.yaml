@@ -4,4 +4,4 @@ metadata:
   namespace: crawler-bot
   name: seq-configmap
 data:
-  log_url: seq-service.crawler-bot.svc.cluster.local:5341
+  log_url: http://seq-service.crawler-bot.svc.cluster.local:5341
