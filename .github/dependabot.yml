@@ -1,6 +1,6 @@
 version: 2
 updates:
-  - package-ecosystem: "dotnet"
+  - package-ecosystem: "nuget"
     directory: "/" # Localização dos arquivos de manifesto de pacote do .NET
     schedule:
       interval: "weekly"
