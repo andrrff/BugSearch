@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/andrrff/BugSearch/assets/13167954/e6fdc0e7-1a8a-4d64-8b69-8d0379022b86" style="width: 300px;" alt="BugSearch drawio">
+  <img src="https://github.com/andrrff/BugSearch/assets/13167954/4fbc2696-9c47-4965-b1bb-dbdc40ba5c07" style="width: 300px; border-radius: 50%;" alt="BugSearch drawio">
   <h1>BugSearch V2</h1>
 </p>
 
