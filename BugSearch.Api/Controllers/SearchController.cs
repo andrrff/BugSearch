@@ -36,6 +36,16 @@ public class SearchController : ControllerBase
 
         Log.CloseAndFlush();
         
-        return new SearchResult();
+        return new SearchResult(){
+            Id = reqId,
+            Query = q,
+            SearchResults = new List<WebSiteInfo>(),
+            Pagination = new Pagination()
+            {
+                CurrentPage = p,
+                TotalPages = 0,
+                ItemsPerPage = m
+            }
+        };
     }
 }
