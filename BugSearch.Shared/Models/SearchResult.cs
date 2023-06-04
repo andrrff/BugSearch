@@ -8,13 +8,17 @@ public class SearchResult
     {
     }
 
-    public SearchResult(string id)
+    public SearchResult(string id, string query)
     {
-        Id = id;
+        Id    = id;
+        Query = query;
     }
 
     [JsonPropertyName("id")]
     public string? Id { get; set; }
+
+    [JsonPropertyName("query")]
+    public string? Query { get; set; }
 
     [JsonPropertyName("searchResults")]
     public List<WebSiteInfo> SearchResults { get; set; } = new();

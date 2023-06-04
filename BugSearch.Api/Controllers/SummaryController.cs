@@ -32,6 +32,8 @@ public class SummaryController : ControllerBase
             Log.Logger.Error(ex, "Error on GetSummary (API)");
         }
 
+        Log.CloseAndFlush();
+
         return new SummaryResult();
     }
 }

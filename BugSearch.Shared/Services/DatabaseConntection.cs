@@ -69,7 +69,7 @@ public class DatabaseConntection
 
     public SearchResult FindWebSites(string id, string query, int currentPage, int itemsPerPage = 20)
     {
-        SearchResult result = new(id);
+        SearchResult result = new(id, query);
         List<string> terms = new();
         query = NormalizeString(query);
 

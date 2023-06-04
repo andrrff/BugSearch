@@ -21,6 +21,8 @@ public class PromptController : ControllerBase
             Log.Logger.Error(ex, "Error on GetAsync OpenAI.PromptSearch (API)");
         }
 
+        Log.CloseAndFlush();
+
         return string.Empty;
     }
 }

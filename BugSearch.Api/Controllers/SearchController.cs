@@ -33,6 +33,8 @@ public class SearchController : ControllerBase
         {
             Log.Logger.Error(ex, $"{reqId} - Error on GetSearch (API)");
         }
+
+        Log.CloseAndFlush();
         
         return new SearchResult();
     }

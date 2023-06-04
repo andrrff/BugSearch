@@ -39,6 +39,8 @@ namespace BugSearch.Crawler.Controllers
                 Log.Logger.Error(ex, "Error on Spider (Crawler)");
             }
 
+            Log.CloseAndFlush();
+
             return new JsonResult(CrawlerJob.NotFound());
         }
 
@@ -56,6 +58,8 @@ namespace BugSearch.Crawler.Controllers
             {
                 Log.Logger.Error(ex, "Error on GetSpiderList");
             }
+
+            Log.CloseAndFlush();
 
             return new JsonResult(new List<CrawlerJob>());
         }
@@ -88,6 +92,8 @@ namespace BugSearch.Crawler.Controllers
                 Log.Logger.Error(ex, "{jobId} - Error on GetJobStatus (Crawler)", jobId);
             }
 
+            Log.CloseAndFlush();
+
             return new JsonResult(CrawlerJob.NotFound());
         }
 
@@ -119,6 +125,8 @@ namespace BugSearch.Crawler.Controllers
                 Log.Logger.Error(ex, "{jobId} - Error on CancelJob (Crawler)", jobId);
             }
 
+            Log.CloseAndFlush();
+
             return new JsonResult(CrawlerJob.NotFound());
         }
 
@@ -149,6 +157,8 @@ namespace BugSearch.Crawler.Controllers
             {
                 Log.Logger.Error(ex, "Error on CancelJobs (Crawler)");
             }
+
+            Log.CloseAndFlush();
 
             return new JsonResult(new List<CrawlerJob>());
         }
