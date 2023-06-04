@@ -44,6 +44,8 @@ public class SearchResult
 
         return new SearchResult
         {
+            Id = this.Id,
+            Query = this.Query,
             SearchResults = currentPageItems,
             Pagination = new Pagination
             {
