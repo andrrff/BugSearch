@@ -13,7 +13,7 @@ BugSearch é um motor de pesquisa de páginas indexadas pelo crawler BugSearch.C
 
 ## Repo UI
 
-Interface gráfica feita em flutter https://github.com/1mrschneider/bug_search_ui
+Interface gráfica feita por _**Vinicius Schneider**_ (@1mrschneider) https://github.com/1mrschneider/bug_search_ui
 
 ## Repo V1
 
