@@ -25,13 +25,13 @@ public class SearchController : ControllerBase
 
         try
         {
-            Log.Logger.Information($"{reqId} - GetSearch: {q}, {p}, {m} (API)");
+            Log.Logger.Information("{RequestId} - GetSearch: {Query}, {Param}, {Mode} (API)", reqId.Replace(Environment.NewLine, string.Empty), q.Replace(Environment.NewLine, string.Empty), p, m);
             var result = _context.FindWebSites(reqId, q, p, m);
             return result.GetPage(p, m);
         }
         catch (Exception ex)
         {
-            Log.Logger.Error(ex, $"{reqId} - Error on GetSearch (API)");
+            Log.Logger.Error(ex, "{RequestId} - Error on GetSearch (API)", reqId.Replace(Environment.NewLine, string.Empty));
         }
 
         Log.CloseAndFlush();

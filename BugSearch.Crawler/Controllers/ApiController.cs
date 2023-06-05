@@ -25,9 +25,9 @@ namespace BugSearch.Crawler.Controllers
         {
             try
             {
-                Log.Logger.Information($"Spider: {req.Urls} (Crawler)");
                 var jobTask        = new CrawlerJob(JobStatus.Waiting, req.Urls, new CancellationTokenSource());
                 var crawlerService = new CrawlerService(req, jobTask);
+                Log.Logger.Information("{jobTask} - Spider (Crawler)", jobTask.JobId.Replace(Environment.NewLine, string.Empty));
 
                 TaskJobs.GetInstance().AddJob(jobTask);
                 await crawlerService.StartAsync(jobTask.CancellationTokenSource.Token);
@@ -51,6 +51,7 @@ namespace BugSearch.Crawler.Controllers
             try
             {
                 var spiderList = TaskJobs.GetInstance().GetJobs();
+                Log.Logger.Information("GetSpiderList (Crawler)");
 
                 return new JsonResult(spiderList);
             }
@@ -79,6 +80,9 @@ namespace BugSearch.Crawler.Controllers
                     {
                         jobTask.Status = JobStatus.Running;
                         TaskJobs.GetInstance().UpdateJob(jobTask);
+
+                        Log.Logger.Information("{jobId} - GetJobStatus (Crawler)", jobId.Replace(Environment.NewLine, string.Empty));
+
                         return new JsonResult(jobTask);
                     }
                     else
@@ -89,7 +93,7 @@ namespace BugSearch.Crawler.Controllers
             }
             catch (Exception ex)
             {
-                Log.Logger.Error(ex, $"{jobId} - Error on GetJobStatus (Crawler)");
+                Log.Logger.Error(ex, "{jobId} - Error on GetJobStatus (Crawler)", jobId.Replace(Environment.NewLine, string.Empty));
             }
 
             Log.CloseAndFlush();
@@ -116,13 +120,15 @@ namespace BugSearch.Crawler.Controllers
                         jobTask.Message = "O trabalho foi cancelado com sucesso.";
                         TaskJobs.GetInstance().UpdateJob(jobTask);
 
+                        Log.Logger.Information("{jobId} - CancelJob (Crawler)", jobId.Replace(Environment.NewLine, string.Empty));
+
                         return new JsonResult(jobTask);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Log.Logger.Error(ex, $"{jobId} - Error on CancelJob (Crawler)");
+                Log.Logger.Error(ex, "{jobId} - Error on CancelJob (Crawler)", jobId.Replace(Environment.NewLine, string.Empty));
             }
 
             Log.CloseAndFlush();
@@ -148,6 +154,8 @@ namespace BugSearch.Crawler.Controllers
                         jobTask.Status = JobStatus.Canceled;
                         jobTask.Message = "O trabalho foi cancelado com sucesso.";
                         TaskJobs.GetInstance().UpdateJob(jobTask);
+
+                        Log.Logger.Information("All - CancelJobs (Crawler)");
                     }
                 }
 
