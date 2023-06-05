@@ -45,7 +45,7 @@ public class RobotSpider : Spider
                 .ToList()
                 .ForEach(async url => await AddRequestsAsync(new Request(url)
                 {
-                    Timeout = 10000
+                    Timeout = 1000000
                 }));
         }, stoppingToken);
 
