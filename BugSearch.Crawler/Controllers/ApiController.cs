@@ -25,7 +25,7 @@ namespace BugSearch.Crawler.Controllers
         {
             try
             {
-                Log.Logger.Information("Spider: {Urls} (Crawler)", req.Urls);
+                Log.Logger.Information($"Spider: {req.Urls} (Crawler)");
                 var jobTask        = new CrawlerJob(JobStatus.Waiting, req.Urls, new CancellationTokenSource());
                 var crawlerService = new CrawlerService(req, jobTask);
 
@@ -89,7 +89,7 @@ namespace BugSearch.Crawler.Controllers
             }
             catch (Exception ex)
             {
-                Log.Logger.Error(ex, "{jobId} - Error on GetJobStatus (Crawler)", jobId);
+                Log.Logger.Error(ex, $"{jobId} - Error on GetJobStatus (Crawler)");
             }
 
             Log.CloseAndFlush();
@@ -122,7 +122,7 @@ namespace BugSearch.Crawler.Controllers
             }
             catch (Exception ex)
             {
-                Log.Logger.Error(ex, "{jobId} - Error on CancelJob (Crawler)", jobId);
+                Log.Logger.Error(ex, $"{jobId} - Error on CancelJob (Crawler)");
             }
 
             Log.CloseAndFlush();

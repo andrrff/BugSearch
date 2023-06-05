@@ -25,7 +25,7 @@ public class SearchController : ControllerBase
 
         try
         {
-            Log.Logger.Information("{id} - GetSearch: {q}, {p}, {m} (API)", reqId, q, p, m);
+            Log.Logger.Information($"{reqId} - GetSearch: {q}, {p}, {m} (API)");
             var result = _context.FindWebSites(reqId, q, p, m);
             return result.GetPage(p, m);
         }

@@ -13,7 +13,8 @@ public class PromptController : ControllerBase
     {
         try
         {
-            Log.Logger.Information("GetAsync OpenAI.PromptSearch: {q} (API)", q);
+            Log.Logger.Information($"GetAsync OpenAI.PromptSearch: {q} (API)");
+
             return await OpenAI.PromptSearch(q);
         }
         catch (Exception ex)
