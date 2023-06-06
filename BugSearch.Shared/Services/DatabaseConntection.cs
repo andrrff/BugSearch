@@ -83,12 +83,12 @@ public class DatabaseConntection
         }
 
         List<EventCrawler> collectionEvents = new();
+        var collectionEventCrawler = _collectionEventCrawler.Find(x => true).ToList();
 
         Parallel.ForEach(terms, term =>
         {
             var normalizedTerm = NormalizeString(term);
-            collectionEvents.AddRange(_collectionEventCrawler.Find(x => true)
-                                               .ToList()
+            collectionEvents.AddRange(collectionEventCrawler
                                                .Where(x => x.Terms.Contains(normalizedTerm) ||
                                                            (!string.IsNullOrEmpty(x.Title) && NormalizeString(x.Title).Contains(normalizedTerm)) ||
                                                            (!string.IsNullOrEmpty(x.Url) && NormalizeString(x.Url).Contains(normalizedTerm)) ||
