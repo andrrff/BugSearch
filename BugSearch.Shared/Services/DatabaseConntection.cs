@@ -1,8 +1,8 @@
-using MongoDB.Driver;
-using BugSearch.Shared.Models;
-using System.Text.RegularExpressions;
 using System.Text;
+using MongoDB.Driver;
 using System.Globalization;
+using BugSearch.Shared.Models;
+using System.Collections.Concurrent;
 
 namespace BugSearch.Shared.Services;
 
@@ -82,25 +82,29 @@ public class DatabaseConntection
             }
         }
 
-        List<EventCrawler> collectionEvents = new List<EventCrawler>();
+        ConcurrentBag<EventCrawler> collectionEvents = new ConcurrentBag<EventCrawler>();
 
-        foreach (var term in terms)
+        Parallel.ForEach(terms, term =>
         {
             var normalizedTerm = NormalizeString(term);
-            collectionEvents.AddRange(_collectionEventCrawler.Find(x => true)
-                                                             .ToList()
-                                                             .Where(x => x.Terms.Contains(normalizedTerm) ||
-                                                                         (!string.IsNullOrEmpty(x.Title) && NormalizeString(x.Title).Contains(normalizedTerm)) ||
-                                                                         (!string.IsNullOrEmpty(x.Url) && NormalizeString(x.Url).Contains(normalizedTerm)) ||
-                                                                         (!string.IsNullOrEmpty(x.Description) && NormalizeString(x.Description).Contains(normalizedTerm)) ||
-                                                                         (!string.IsNullOrEmpty(x.Name) && NormalizeString(x.Name).Contains(normalizedTerm)))
-                                                             .ToList());
+            var events = _collectionEventCrawler.Find(x => true)
+                                               .ToList()
+                                               .Where(x => x.Terms.Contains(normalizedTerm) ||
+                                                           (!string.IsNullOrEmpty(x.Title) && NormalizeString(x.Title).Contains(normalizedTerm)) ||
+                                                           (!string.IsNullOrEmpty(x.Url) && NormalizeString(x.Url).Contains(normalizedTerm)) ||
+                                                           (!string.IsNullOrEmpty(x.Description) && NormalizeString(x.Description).Contains(normalizedTerm)) ||
+                                                           (!string.IsNullOrEmpty(x.Name) && NormalizeString(x.Name).Contains(normalizedTerm)))
+                                               .ToList();
 
-        }
+            foreach (var ev in events)
+            {
+                collectionEvents.Add(ev);
+            }
+        });
 
-        collectionEvents = collectionEvents.DistinctBy(x => x.Title).ToList();
+        List<EventCrawler> distinctEvents = collectionEvents.DistinctBy(x => x.Title).ToList();
 
-        foreach (var x in collectionEvents)
+        Parallel.ForEach(distinctEvents, x =>
         {
             string normalizedTitle       = NormalizeString(x.Title);
             string normalizedDescription = NormalizeString(x.Description);
@@ -155,7 +159,7 @@ public class DatabaseConntection
                 Locale      = x.Locale,
                 Pts         = x.Pts
             });
-        }
+        });
 
         result.SearchResults.Sort((x, y) => y.Pts.CompareTo(x.Pts));
 
