@@ -80,36 +80,39 @@ public class DatabaseConntection
             .Where(term => query.Length > 3 ? term.Length > 2 : term.Length > 1)
             .ToList();
 
+        var collectionEvents = new List<EventCrawler>();
+
         Parallel.ForEach(terms, term => 
         {
             term = NormalizeString(term);
 
-            var collectionEvents = _collectionEventCrawler.Find(x => true)
-                                                          .ToList()
-                                                          .FindAll(x => x.Terms.Contains(term.ToLower()) ||
-                                                            (!string.IsNullOrEmpty(x.Title) && NormalizeString(x.Title).Contains(NormalizeString(term))) ||
-                                                            (!string.IsNullOrEmpty(x.Url) && NormalizeString(x.Url).Contains(NormalizeString(term))) ||
-                                                            (!string.IsNullOrEmpty(x.Description) && NormalizeString(x.Description).Contains(NormalizeString(term))) ||
-                                                            (!string.IsNullOrEmpty(x.Name) && NormalizeString(x.Name).Contains(NormalizeString(term))))
-                                                          .ToList();
+            collectionEvents.AddRange(_collectionEventCrawler.Find(x => true)
+                                                             .ToList()
+                                                             .FindAll(x => x.Terms.Contains(term.ToLower()) ||
+                                                                    (!string.IsNullOrEmpty(x.Title) && NormalizeString(x.Title).Contains(NormalizeString(term))) ||
+                                                                    (!string.IsNullOrEmpty(x.Url) && NormalizeString(x.Url).Contains(NormalizeString(term))) ||
+                                                                    (!string.IsNullOrEmpty(x.Description) && NormalizeString(x.Description).Contains(NormalizeString(term))) ||
+                                                                    (!string.IsNullOrEmpty(x.Name) && NormalizeString(x.Name).Contains(NormalizeString(term))))
+                                                             .ToList());
+        });
 
-            Parallel.ForEach(collectionEvents, x =>
+        collectionEvents = collectionEvents.DistinctBy(x => x.Title).ToList();
+
+        Parallel.ForEach(collectionEvents, x =>
+        {
+            Parallel.ForEach(terms, term => 
             {
-                var nameCount        = Regex.Matches(NormalizeString(x.Name), term, RegexOptions.IgnoreCase).Count();
-                var descriptionCount = Regex.Matches(NormalizeString(x.Description), term, RegexOptions.IgnoreCase).Count();
-                var titleCount       = Regex.Matches(NormalizeString(x.Title), term, RegexOptions.IgnoreCase).Count();
-                
-                x.Pts = (
-                        (string.IsNullOrEmpty(x.Name)  ? 0 : (nameCount > 0   ? nameCount * term.Length * 20 : term.Length * -0.1)) +
-                        (string.IsNullOrEmpty(x.Name)  ? 0 : (nameCount > 0  ? nameCount * term.Length * 30 : term.Length * -0.3)) +
-                        (string.IsNullOrEmpty(x.Description) ? 0 : (descriptionCount > 0 ? descriptionCount * term.Length * 40 : term.Length * -8)) +
-                        (string.IsNullOrEmpty(x.Description) ? 0 : (descriptionCount > 0 ? descriptionCount * term.Length * 50 : term.Length * -10)) +
-                        (string.IsNullOrEmpty(x.Url)   ? 0 : (NormalizeString(x.Url).Contains(term)    ? 1 * term.Length * 25 : term.Length * -5)) +
-                        (string.IsNullOrEmpty(x.Url)   ? 0 : (NormalizeString(x.Url).Contains(query)   ? 1 * term.Length * 30 : term.Length * -2.5)) +
-                        (string.IsNullOrEmpty(x.Title) ? 0 : (titleCount > 0  ? titleCount * term.Length * 60 : term.Length * -10)) +
-                        (string.IsNullOrEmpty(x.Title) ? 0 : (titleCount > 0 ? titleCount * term.Length * 70 : term.Length * -5)) +
-                        (string.IsNullOrEmpty(x.Body)  ? 0 : (NormalizeString(x.Body).Contains(term)   ? 1 * term.Length * 10 : term.Length * -30)) +
-                        (string.IsNullOrEmpty(x.Body)  ? 0 : (NormalizeString(x.Body).Contains(query)  ? 1 * term.Length * 50 : term.Length * -1)));
+                x.Pts += (
+                        (string.IsNullOrEmpty(x.Name) ? 0 : (NormalizeString(x.Name).Contains(term) ? 1 * term.Length * 20 : term.Length * -0.1)) +
+                        (string.IsNullOrEmpty(x.Name) ? 0 : (NormalizeString(x.Name).Contains(query) ? 1 * term.Length * 30 : term.Length * -0.3)) +
+                        (string.IsNullOrEmpty(x.Description) ? 0 : (NormalizeString(x.Description).Contains(term) ? 1 * term.Length * 40 : term.Length * -8)) +
+                        (string.IsNullOrEmpty(x.Description) ? 0 : (NormalizeString(x.Description).Contains(query) ? 1 * term.Length * 50 : term.Length * -10)) +
+                        (string.IsNullOrEmpty(x.Url) ? 0 : (NormalizeString(x.Url).Contains(term) ? 1 * term.Length * 25 : term.Length * -5)) +
+                        (string.IsNullOrEmpty(x.Url) ? 0 : (NormalizeString(x.Url).Contains(query) ? 1 * term.Length * 30 : term.Length * -2.5)) +
+                        (string.IsNullOrEmpty(x.Title) ? 0 : (NormalizeString(x.Title).Contains(term) ? 1 * term.Length * 60 : term.Length * -10)) +
+                        (string.IsNullOrEmpty(x.Title) ? 0 : (NormalizeString(x.Title).Contains(query) ? 1 * term.Length * 70 : term.Length * -5)) +
+                        (string.IsNullOrEmpty(x.Body) ? 0 : (NormalizeString(x.Body).Contains(term) ? 1 * term.Length * 10 : term.Length * -30)) +
+                        (string.IsNullOrEmpty(x.Body) ? 0 : (NormalizeString(x.Body).Contains(query) ? 1 * term.Length * 50 : term.Length * -1)));
 
                 if (string.IsNullOrEmpty(x.Description))
                 {
@@ -117,7 +120,7 @@ public class DatabaseConntection
 
                     var index = x.Body.IndexOf(term, StringComparison.OrdinalIgnoreCase);
                     var start = index - 150;
-                    var end   = index + 150;
+                    var end = index + 150;
 
                     if (start < 0)
                     {
@@ -131,34 +134,31 @@ public class DatabaseConntection
 
                     x.Description = x.Body[start..end];
                 }
+            });
 
-                result.SearchResults.Add(new WebSiteInfo
-                {
-                    Name        = x.Name,
-                    Link        = x.Url,
-                    Favicon     = x.Favicon,
-                    Title       = x.Title,
-                    Description = x.Description,
-                    Type        = x.Type,
-                    Image       = x.Image,
-                    Locale      = x.Locale,
-                    Pts         = x.Pts
-                });
+            result.SearchResults.Add(new WebSiteInfo
+            {
+                Name        = x.Name,
+                Link        = x.Url,
+                Favicon     = x.Favicon,
+                Title       = x.Title,
+                Description = x.Description,
+                Type        = x.Type,
+                Image       = x.Image,
+                Locale      = x.Locale,
+                Pts         = x.Pts
             });
         });
 
-        result.SearchResults = result.SearchResults
-                                     .OrderByDescending(x => x.Pts)
-                                     .DistinctBy(x => x.Title)
-                                     .ToList();
+        result.SearchResults = result.SearchResults.OrderByDescending(x => x.Pts).ToList();
 
         return result;
     }
 
-    private string NormalizeString(string? input)
+    private string NormalizeString(string input)
     {
         if (string.IsNullOrEmpty(input))
-            return string.Empty;
+            return input;
 
         string normalizedString = input.Normalize(NormalizationForm.FormD);
         StringBuilder stringBuilder = new StringBuilder();
