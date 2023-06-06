@@ -32,13 +32,13 @@ class EventCrawlerParser : DataParser
                 }
             }
 
-            if (!string.IsNullOrEmpty(url))
+            if (!string.IsNullOrEmpty(url) && (!string.IsNullOrEmpty(name) || !string.IsNullOrEmpty(title)))
             {
                 context.AddData(typeName, new EventCrawler
                 {
                     Url         = url,
-                    Name        = name,
-                    Title       = title ?? name,
+                    Name        = string.IsNullOrEmpty(name) ? title : name,
+                    Title       = string.IsNullOrEmpty(title) ? name : title,
                     Favicon     = favicon,
                     Description = description,
                     Type        = type,
