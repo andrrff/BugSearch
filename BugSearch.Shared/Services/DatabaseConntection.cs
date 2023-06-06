@@ -69,8 +69,8 @@ public class DatabaseConntection
 
     public SearchResult FindWebSites(string id, string query, int currentPage, int itemsPerPage = 20)
     {
-        SearchResult result = new SearchResult(id, query);
-        HashSet<string> terms = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        SearchResult result   = new(id, query);
+        HashSet<string> terms = new(StringComparer.OrdinalIgnoreCase);
 
         query = NormalizeString(query);
         foreach (var term in query.Split(' '))
@@ -82,27 +82,22 @@ public class DatabaseConntection
             }
         }
 
-        ConcurrentBag<EventCrawler> collectionEvents = new ConcurrentBag<EventCrawler>();
+        List<EventCrawler> collectionEvents = new();
 
         Parallel.ForEach(terms, term =>
         {
             var normalizedTerm = NormalizeString(term);
-            var events = _collectionEventCrawler.Find(x => true)
+            collectionEvents.AddRange(_collectionEventCrawler.Find(x => true)
                                                .ToList()
                                                .Where(x => x.Terms.Contains(normalizedTerm) ||
                                                            (!string.IsNullOrEmpty(x.Title) && NormalizeString(x.Title).Contains(normalizedTerm)) ||
                                                            (!string.IsNullOrEmpty(x.Url) && NormalizeString(x.Url).Contains(normalizedTerm)) ||
                                                            (!string.IsNullOrEmpty(x.Description) && NormalizeString(x.Description).Contains(normalizedTerm)) ||
                                                            (!string.IsNullOrEmpty(x.Name) && NormalizeString(x.Name).Contains(normalizedTerm)))
-                                               .ToList();
-
-            foreach (var ev in events)
-            {
-                collectionEvents.Add(ev);
-            }
+                                               .ToList());
         });
 
-        List<EventCrawler> distinctEvents = collectionEvents.DistinctBy(x => x.Title).ToList();
+        var distinctEvents = collectionEvents.DistinctBy(x => x.Title).ToList();
 
         Parallel.ForEach(distinctEvents, x =>
         {
@@ -124,27 +119,6 @@ public class DatabaseConntection
                     (string.IsNullOrEmpty(x.Title) ? 0 : (normalizedTitle.Contains(query) ? 1 * term.Length * 70 : term.Length * -5)) +
                     (string.IsNullOrEmpty(x.Body) ? 0 : (normalizedBody.Contains(term) ? 1 * term.Length * 10 : term.Length * -30)) +
                     (string.IsNullOrEmpty(x.Body) ? 0 : (normalizedBody.Contains(query) ? 1 * term.Length * 50 : term.Length * -1)));
-
-                if (string.IsNullOrEmpty(x.Description))
-                {
-                    x.Body ??= string.Empty;
-
-                    var index = normalizedBody.IndexOf(term, StringComparison.OrdinalIgnoreCase);
-                    var start = index - 150;
-                    var end   = index + 150;
-
-                    if (start < 0)
-                    {
-                        start = 0;
-                    }
-
-                    if (end > normalizedBody.Length)
-                    {
-                        end = normalizedBody.Length;
-                    }
-
-                    x.Description = x.Body[start..end];
-                }
             }
 
             result.SearchResults.Add(new WebSiteInfo
@@ -172,7 +146,7 @@ public class DatabaseConntection
             return string.Empty;
 
         string normalizedString = input.Normalize(NormalizationForm.FormD);
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new();
 
         foreach (char c in normalizedString)
         {
