@@ -52,4 +52,16 @@ public class TaskJobs
         jobs.ElementAt(index).Status = job.Status;
         _jobs = jobs;
     }
+
+    public void RemoveJob(string jobId)
+    {
+        var jobs = _jobs;
+        jobs = jobs.Where(x => x.JobId != jobId);
+        _jobs = jobs;
+    }
+
+    public void RemoveAllJobs()
+    {
+        _jobs = new List<CrawlerJob>();
+    }
 }

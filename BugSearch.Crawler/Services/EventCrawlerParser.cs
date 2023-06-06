@@ -22,13 +22,23 @@ class EventCrawlerParser : DataParser
             var body        = Regex.Replace(context.Selectable.XPath(".//body")?.Value ?? string.Empty, "[^a-zA-Z]+", " ") ?? string.Empty;
             var terms       = body?.Split(" ", StringSplitOptions.RemoveEmptyEntries).Distinct().Select(term => term.ToLower()).Where(term => term.Length > 2).ToArray() ?? default;
 
-            if (!string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(url))
+            var links = context.Selectable.Links().Distinct().ToArray();
+
+            foreach (var link in links)
+            {
+                if (Uri.TryCreate(link, UriKind.Absolute, out var uri))
+                {
+                    context.AddFollowRequests(new DotnetSpider.Http.Request(uri.ToString()));
+                }
+            }
+
+            if (!string.IsNullOrEmpty(url))
             {
                 context.AddData(typeName, new EventCrawler
                 {
                     Url         = url,
                     Name        = name,
-                    Title       = title,
+                    Title       = title ?? name,
                     Favicon     = favicon,
                     Description = description,
                     Type        = type,
@@ -50,9 +60,6 @@ class EventCrawlerParser : DataParser
 
         public override Task InitializeAsync()
         {
-            AddRequiredValidator(".com");
-            AddFollowRequestQuerier(Selectors.XPath("."));
-
             return Task.CompletedTask;
         }
     }

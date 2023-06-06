@@ -43,18 +43,15 @@ public class RobotSpider : Spider
                 .GetInstance()
                 .GetUrls()
                 .ToList()
-                .ForEach(async url => await AddRequestsAsync(new Request(url)
-                {
-                    Timeout = 10000
-                }));
+                .ForEach(async url => await AddRequestsAsync(new Request(url)));
         }, stoppingToken);
 
         AddDataFlow(new EventCrawlerParser());
 
         if (RobotSingleton.GetInstance().PersistData)
             AddDataFlow(new Persistence());
-            
-        AddDataFlow(new ConsoleStorage());
+
+        AddDataFlow(new ConsoleLogging());
     }
 
     protected override SpiderId GenerateSpiderId()

@@ -101,7 +101,7 @@ namespace BugSearch.Crawler.Controllers
             return new JsonResult(CrawlerJob.NotFound());
         }
 
-        [HttpPost("task/{jobId}/cancel", Name = "CancelJob")]
+        [HttpPatch("task/{jobId}/cancel", Name = "CancelJob")]
         public ActionResult<CrawlerJob> CancelJob(string jobId)
         {
             try
@@ -136,7 +136,7 @@ namespace BugSearch.Crawler.Controllers
             return new JsonResult(CrawlerJob.NotFound());
         }
 
-        [HttpPost("task/cancel", Name = "CancelJobs")]
+        [HttpPatch("task/cancel", Name = "CancelJobs")]
         public ActionResult<IEnumerable<CrawlerJob>> CancelJobs()
         {
             try
@@ -164,6 +164,80 @@ namespace BugSearch.Crawler.Controllers
             catch (Exception ex)
             {
                 Log.Logger.Error(ex, "Error on CancelJobs (Crawler)");
+            }
+
+            Log.CloseAndFlush();
+
+            return new JsonResult(new List<CrawlerJob>());
+        }
+
+        [HttpDelete("task/{jobId}/delete", Name = "DeleteJob")]
+        public ActionResult<CrawlerJob> DeleteJob(string jobId)
+        {
+            try
+            {
+                var jobTask = TaskJobs.GetInstance().GetJob(jobId);
+
+                if (jobTask is not default(CrawlerJob))
+                {
+                    var cancellationTokenSource = jobTask.CancellationTokenSource;
+
+                    if (!cancellationTokenSource.Token.IsCancellationRequested)
+                    {
+                        cancellationTokenSource.Cancel();
+
+                        jobTask.Status = JobStatus.Canceled;
+                        jobTask.Message = "O trabalho foi cancelado com sucesso.";
+                        TaskJobs.GetInstance().UpdateJob(jobTask);
+
+                        Log.Logger.Information("{jobId} - DeleteJob (Crawler)", jobId.Replace(Environment.NewLine, string.Empty));
+                    }
+
+                    TaskJobs.GetInstance().RemoveJob(jobId);
+
+                    return new JsonResult(jobTask);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, "{jobId} - Error on DeleteJob (Crawler)", jobId.Replace(Environment.NewLine, string.Empty));
+            }
+
+            Log.CloseAndFlush();
+
+            return new JsonResult(CrawlerJob.NotFound());
+        }
+
+        [HttpDelete("task/delete", Name = "DeleteJobs")]
+        public ActionResult<IEnumerable<CrawlerJob>> DeleteJobs()
+        {
+            try
+            {
+                var jobTasks = TaskJobs.GetInstance().GetJobs();
+
+                foreach (var jobTask in jobTasks)
+                {
+                    var cancellationTokenSource = jobTask.CancellationTokenSource;
+
+                    if (!cancellationTokenSource.Token.IsCancellationRequested)
+                    {
+                        cancellationTokenSource.Cancel();
+
+                        jobTask.Status = JobStatus.Canceled;
+                        jobTask.Message = "O trabalho foi cancelado com sucesso.";
+                        TaskJobs.GetInstance().UpdateJob(jobTask);
+
+                        Log.Logger.Information("All - DeleteJobs (Crawler)");
+                    }
+                }
+
+                TaskJobs.GetInstance().RemoveAllJobs();
+
+                return new JsonResult(jobTasks);
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, "Error on DeleteJobs (Crawler)");
             }
 
             Log.CloseAndFlush();
