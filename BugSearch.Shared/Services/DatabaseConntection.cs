@@ -97,21 +97,19 @@ public class DatabaseConntection
             {
                 var nameCount        = Regex.Matches(NormalizeString(x.Name), term, RegexOptions.IgnoreCase).Count();
                 var descriptionCount = Regex.Matches(NormalizeString(x.Description), term, RegexOptions.IgnoreCase).Count();
-                var urlCount         = Regex.Matches(NormalizeString(x.Url), term, RegexOptions.IgnoreCase).Count();
                 var titleCount       = Regex.Matches(NormalizeString(x.Title), term, RegexOptions.IgnoreCase).Count();
-                var bodyCount        = Regex.Matches(NormalizeString(x.Body), term, RegexOptions.IgnoreCase).Count();
                 
                 x.Pts = (
                         (string.IsNullOrEmpty(x.Name)  ? 0 : (nameCount > 0   ? nameCount * term.Length * 20 : term.Length * -0.1)) +
                         (string.IsNullOrEmpty(x.Name)  ? 0 : (nameCount > 0  ? nameCount * term.Length * 30 : term.Length * -0.3)) +
                         (string.IsNullOrEmpty(x.Description) ? 0 : (descriptionCount > 0 ? descriptionCount * term.Length * 40 : term.Length * -8)) +
                         (string.IsNullOrEmpty(x.Description) ? 0 : (descriptionCount > 0 ? descriptionCount * term.Length * 50 : term.Length * -10)) +
-                        (string.IsNullOrEmpty(x.Url)   ? 0 : (urlCount > 0    ? urlCount * term.Length * 25 : term.Length * -5)) +
-                        (string.IsNullOrEmpty(x.Url)   ? 0 : (urlCount > 0   ? urlCount * term.Length * 30 : term.Length * -2.5)) +
+                        (string.IsNullOrEmpty(x.Url)   ? 0 : (NormalizeString(x.Url).Contains(term)    ? 1 * term.Length * 25 : term.Length * -5)) +
+                        (string.IsNullOrEmpty(x.Url)   ? 0 : (NormalizeString(x.Url).Contains(query)   ? 1 * term.Length * 30 : term.Length * -2.5)) +
                         (string.IsNullOrEmpty(x.Title) ? 0 : (titleCount > 0  ? titleCount * term.Length * 60 : term.Length * -10)) +
                         (string.IsNullOrEmpty(x.Title) ? 0 : (titleCount > 0 ? titleCount * term.Length * 70 : term.Length * -5)) +
-                        (string.IsNullOrEmpty(x.Body)  ? 0 : (bodyCount > 0   ? bodyCount * term.Length * 10 : term.Length * -30)) +
-                        (string.IsNullOrEmpty(x.Body)  ? 0 : (bodyCount > 0  ? bodyCount * term.Length * 50 : term.Length * -1)));
+                        (string.IsNullOrEmpty(x.Body)  ? 0 : (NormalizeString(x.Body).Contains(term)   ? 1 * term.Length * 10 : term.Length * -30)) +
+                        (string.IsNullOrEmpty(x.Body)  ? 0 : (NormalizeString(x.Body).Contains(query)  ? 1 * term.Length * 50 : term.Length * -1)));
 
                 if (string.IsNullOrEmpty(x.Description))
                 {
