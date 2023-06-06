@@ -1,4 +1,5 @@
 using Serilog;
+using System.Net;
 using BugSearch.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,7 +9,14 @@ namespace BugSearch.Api.Controllers;
 [Route("[controller]")]
 public class PromptController : ControllerBase
 {
+    /// <summary>
+    /// Envia uma query para o OpenAI e retorna uma resposta.
+    /// </summary>
+    /// <param name="q" example="Ping!">Query a ser enviada</param>
+    /// <returns>Resposta</returns>
+    /// <response code="200">Retorna a resposta da query</response>
     [HttpGet]
+    [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
     public async Task<string> GetAsync([FromQuery]string q)
     {
         try

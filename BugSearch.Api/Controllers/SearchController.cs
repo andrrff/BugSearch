@@ -1,4 +1,5 @@
 using Serilog;
+using System.Net;
 using BugSearch.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using BugSearch.Shared.Services;
@@ -18,7 +19,16 @@ public class SearchController : ControllerBase
         _context = new DatabaseConntection();
     }
 
+    /// <summary>
+    /// Retorna uma lista de resultados de acordo com a query.
+    /// </summary>
+    /// <param name="q" example="Ultimas noticias">Query a ser enviada</param>
+    /// <param name="p" example="1">Pagina atual</param>
+    /// <param name="m" example="20">Quantidade de itens por pagina</param>
+    /// <returns>Lista de resultados</returns>
+    /// <response code="200">Retorna a lista de resultados</response>
     [HttpGet(Name = "GetSearch")]
+    [ProducesResponseType(typeof(SearchResult), (int)HttpStatusCode.OK)]
     public SearchResult Get([FromQuery] string q, [FromQuery] int p = 1, [FromQuery] int m = 20)
     {
         var reqId = Guid.NewGuid().ToString();

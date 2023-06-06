@@ -1,7 +1,9 @@
 using Serilog;
 using Serilog.Events;
+using System.Reflection;
 using BugSearch.Shared.Enums;
 using BugSearch.Shared.Models;
+using Microsoft.OpenApi.Models;
 using BugSearch.Crawler.Services;
 using BugSearch.Shared.Singletons;
 
@@ -11,7 +13,28 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "BugSearch",
+        Version = "v2",
+        Description = "BugSearch é um motor de pesquisa de páginas indexadas pelo crawler BugSearch.Crawler.",
+        Contact = new OpenApiContact
+        {
+            Name = "BugSearch",
+            Email = "andrecastanhal@gmail.com",
+            Url = new Uri("https://github.com/andrrff/BugSearch")
+        },
+        License = new OpenApiLicense
+        {
+            Name = "Apache License 2.0",
+            Url = new Uri("https://raw.githubusercontent.com/andrrff/BugSearch/master/LICENSE")
+        },
+    });
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+});
 builder.Services.AddSingleton<TaskJobs>(TaskJobs.GetInstance());
 builder.Services.AddSingleton<RobotSingleton>(RobotSingleton.GetInstance());
 builder.Services.AddSingleton<CrawlerRequest>(new CrawlerRequest(new List<string>(), new CrawlerProperties(false, false, 100, 0)));

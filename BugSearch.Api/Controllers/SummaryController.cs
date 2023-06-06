@@ -1,4 +1,5 @@
 using Serilog;
+using System.Net;
 using BugSearch.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using BugSearch.Shared.Services;
@@ -19,7 +20,13 @@ public class SummaryController : ControllerBase
         _context = new DatabaseConntection();
     }
 
+    /// <summary>
+    /// Retorna um resumo de todos os sites e termos.
+    /// </summary>
+    /// <returns>Resumo</returns>
+    /// <response code="200">Retorna o resumo</response>
     [HttpGet(Name = "GetSummary")]
+    [ProducesResponseType(typeof(SummaryResult), (int)HttpStatusCode.OK)]
     public SummaryResult Get()
     {
         try

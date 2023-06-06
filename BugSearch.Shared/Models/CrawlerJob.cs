@@ -37,4 +37,14 @@ public class CrawlerJob
 
         return crawlerJob;
     }
+
+    public static CrawlerJob BadRequest()
+    {
+        var jobId = string.Empty;
+        var crawlerJob = new CrawlerJob(JobStatus.Error, null, new CancellationTokenSource(), "Falha ao criar o trabalho.");
+
+        crawlerJob.JobId = jobId;
+
+        return crawlerJob;
+    }
 }

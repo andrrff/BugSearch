@@ -1,4 +1,5 @@
 using Serilog;
+using System.Net;
 using BugSearch.Shared.Enums;
 using BugSearch.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +21,16 @@ namespace BugSearch.Crawler.Controllers
             _appLifetime = appLifetime;
         }
 
+        /// <summary>
+        /// Cria um novo trabalho de crawler.
+        /// </summary>
+        /// <param name="req">Lista de urls</param>
+        /// <returns></returns>
+        /// <response code="201">Retorna o trabalho criado</response>
+        /// <response code="400">Se houver algum erro</response>
         [HttpPost("task/create", Name = "Spider")]
+        [ProducesResponseType(typeof(CrawlerJob), (int)HttpStatusCode.Created)]
+        [ProducesResponseType(typeof(CrawlerJob), (int)HttpStatusCode.BadRequest)]
         public async Task<ActionResult<CrawlerJob>> PostAsync([FromBody] CrawlerRequest req)
         {
             try
@@ -32,7 +42,10 @@ namespace BugSearch.Crawler.Controllers
                 TaskJobs.GetInstance().AddJob(jobTask);
                 await crawlerService.StartAsync(jobTask.CancellationTokenSource.Token);
 
-                return new JsonResult(jobTask);
+                return new JsonResult(jobTask)
+                {
+                    StatusCode = (int)HttpStatusCode.Created
+                };
             }
             catch (Exception ex)
             {
@@ -41,11 +54,24 @@ namespace BugSearch.Crawler.Controllers
 
             Log.CloseAndFlush();
 
-            return new JsonResult(CrawlerJob.NotFound());
+            return new JsonResult(CrawlerJob.BadRequest())
+            {
+                StatusCode = (int)HttpStatusCode.BadRequest
+            };
         }
 
 
+        /// <summary>
+        /// Retorna uma lista de trabalhos de crawler.
+        /// </summary>
+        /// <returns></returns>
+        /// <response code="200">Retorna a lista de trabalhos</response>
+        /// <response code="204">Se a lista estiver vazia</response>
+        /// <response code="400">Se houver algum erro</response>
         [HttpGet("task/list", Name = "GetSpiderList")]
+        [ProducesResponseType(typeof(IEnumerable<CrawlerJob>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType(typeof(IEnumerable<CrawlerJob>), (int)HttpStatusCode.BadRequest)]
         public ActionResult<IEnumerable<CrawlerJob>> GetSpiderList()
         {
             try
@@ -53,7 +79,18 @@ namespace BugSearch.Crawler.Controllers
                 var spiderList = TaskJobs.GetInstance().GetJobs();
                 Log.Logger.Information("GetSpiderList (Crawler)");
 
-                return new JsonResult(spiderList);
+                if (spiderList is not default(List<CrawlerJob>) && 
+                    spiderList.Count() > 0)
+                {
+                    return new JsonResult(spiderList);
+                }
+                else
+                {
+                    return new JsonResult(new List<CrawlerJob>())
+                    {
+                        StatusCode = (int)HttpStatusCode.NoContent
+                    };
+                }
             }
             catch (Exception ex)
             {
@@ -62,10 +99,26 @@ namespace BugSearch.Crawler.Controllers
 
             Log.CloseAndFlush();
 
-            return new JsonResult(new List<CrawlerJob>());
+            return new JsonResult(CrawlerJob.BadRequest())
+            {
+                StatusCode = (int)HttpStatusCode.BadRequest
+            };
         }
 
+        /// <summary>
+        /// Retorna um trabalho de crawler.
+        /// </summary>
+        /// <param name="jobId" example="0d2625dd-dae1-4d6f-89c1-763a8af4ca3e">Id do trabalho</param>
+        /// <returns></returns>
+        /// <response code="200">Retorna o trabalho</response>
+        /// <response code="406">Se o trabalho não estiver em execução</response>
+        /// <response code="404">Se o trabalho não for encontrado</response>
+        /// <response code="400">Se houver algum erro</response>
         [HttpGet("task/{jobId}/", Name = "GetJobStatus")]
+        [ProducesResponseType(typeof(CrawlerJob), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(CrawlerJob), (int)HttpStatusCode.NotAcceptable)]
+        [ProducesResponseType(typeof(CrawlerJob), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(CrawlerJob), (int)HttpStatusCode.BadRequest)]
         public ActionResult<CrawlerJob> GetJobStatus(string jobId)
         {
             try
@@ -87,8 +140,18 @@ namespace BugSearch.Crawler.Controllers
                     }
                     else
                     {
-                        return new JsonResult(jobTask);
+                        return new JsonResult(jobTask)
+                        {
+                            StatusCode = (int)HttpStatusCode.NotAcceptable
+                        };
                     }
+                }
+                else
+                {
+                    return new JsonResult(CrawlerJob.NotFound())
+                    {
+                        StatusCode = (int)HttpStatusCode.NotFound
+                    };
                 }
             }
             catch (Exception ex)
@@ -98,9 +161,21 @@ namespace BugSearch.Crawler.Controllers
 
             Log.CloseAndFlush();
 
-            return new JsonResult(CrawlerJob.NotFound());
+            return new JsonResult(CrawlerJob.BadRequest())
+            {   
+                StatusCode = (int)HttpStatusCode.BadRequest
+            };
         }
 
+        /// <summary>
+        /// Cancela um trabalho de crawler.
+        /// </summary>
+        /// <param name="jobId" example="0d2625dd-dae1-4d6f-89c1-763a8af4ca3e">Id do trabalho</param>
+        /// <returns></returns>
+        /// <response code="200">Retorna o trabalho cancelado</response>
+        /// <response code="404">Se o trabalho não for encontrado</response>
+        /// <response code="406">Se o trabalho não estiver em execução</response>
+        /// <response code="400">Se houver algum erro</response>
         [HttpPatch("task/{jobId}/cancel", Name = "CancelJob")]
         public ActionResult<CrawlerJob> CancelJob(string jobId)
         {
@@ -124,6 +199,20 @@ namespace BugSearch.Crawler.Controllers
 
                         return new JsonResult(jobTask);
                     }
+                    else
+                    {
+                        return new JsonResult(jobTask)
+                        {
+                            StatusCode = (int)HttpStatusCode.NotAcceptable
+                        };
+                    }
+                }
+                else
+                {
+                    return new JsonResult(CrawlerJob.NotFound())
+                    {
+                        StatusCode = (int)HttpStatusCode.NotFound
+                    };
                 }
             }
             catch (Exception ex)
@@ -133,10 +222,21 @@ namespace BugSearch.Crawler.Controllers
 
             Log.CloseAndFlush();
 
-            return new JsonResult(CrawlerJob.NotFound());
+            return new JsonResult(CrawlerJob.BadRequest())
+            {
+                StatusCode = (int)HttpStatusCode.BadRequest
+            };
         }
 
+        /// <summary>
+        /// Cancela todos os trabalhos de crawler.
+        /// </summary>
+        /// <returns></returns>
+        /// <response code="200">Retorna a lista de trabalhos cancelados</response>
+        /// <response code="400">Se houver algum erro</response>
         [HttpPatch("task/cancel", Name = "CancelJobs")]
+        [ProducesResponseType(typeof(IEnumerable<CrawlerJob>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<CrawlerJob>), (int)HttpStatusCode.BadRequest)]
         public ActionResult<IEnumerable<CrawlerJob>> CancelJobs()
         {
             try
@@ -168,10 +268,24 @@ namespace BugSearch.Crawler.Controllers
 
             Log.CloseAndFlush();
 
-            return new JsonResult(new List<CrawlerJob>());
+            return new JsonResult(CrawlerJob.BadRequest())
+            {
+                StatusCode = (int)HttpStatusCode.BadRequest
+            };
         }
 
+        /// <summary>
+        /// Deleta um trabalho de crawler.
+        /// </summary>
+        /// <param name="jobId" example="0d2625dd-dae1-4d6f-89c1-763a8af4ca3e">Id do trabalho</param>
+        /// <returns></returns>
+        /// <response code="200">Retorna o trabalho deletado</response>
+        /// <response code="404">Se o trabalho não for encontrado</response>
+        /// <response code="400">Se houver algum erro</response>
         [HttpDelete("task/{jobId}/delete", Name = "DeleteJob")]
+        [ProducesResponseType(typeof(CrawlerJob), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(CrawlerJob), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(CrawlerJob), (int)HttpStatusCode.BadRequest)]
         public ActionResult<CrawlerJob> DeleteJob(string jobId)
         {
             try
@@ -197,6 +311,13 @@ namespace BugSearch.Crawler.Controllers
 
                     return new JsonResult(jobTask);
                 }
+                else
+                {
+                    return new JsonResult(CrawlerJob.NotFound())
+                    {
+                        StatusCode = (int)HttpStatusCode.NotFound
+                    };
+                }
             }
             catch (Exception ex)
             {
@@ -205,10 +326,21 @@ namespace BugSearch.Crawler.Controllers
 
             Log.CloseAndFlush();
 
-            return new JsonResult(CrawlerJob.NotFound());
+            return new JsonResult(CrawlerJob.BadRequest())
+            {
+                StatusCode = (int)HttpStatusCode.BadRequest
+            };
         }
 
+        /// <summary>
+        /// Cancela todos os trabalhos de crawler.
+        /// </summary>
+        /// <returns></returns>
+        /// <response code="200">Retorna a lista de trabalhos cancelados</response>
+        /// <response code="400">Se houver algum erro</response>
         [HttpDelete("task/delete", Name = "DeleteJobs")]
+        [ProducesResponseType(typeof(IEnumerable<CrawlerJob>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<CrawlerJob>), (int)HttpStatusCode.BadRequest)]
         public ActionResult<IEnumerable<CrawlerJob>> DeleteJobs()
         {
             try
@@ -242,7 +374,10 @@ namespace BugSearch.Crawler.Controllers
 
             Log.CloseAndFlush();
 
-            return new JsonResult(new List<CrawlerJob>());
+            return new JsonResult(CrawlerJob.BadRequest())
+            {
+                StatusCode = (int)HttpStatusCode.BadRequest
+            };
         }
     }
 }
