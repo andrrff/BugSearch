@@ -177,6 +177,10 @@ namespace BugSearch.Crawler.Controllers
         /// <response code="406">Se o trabalho não estiver em execução</response>
         /// <response code="400">Se houver algum erro</response>
         [HttpPatch("task/{jobId}/cancel", Name = "CancelJob")]
+        [ProducesResponseType(typeof(CrawlerJob), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(CrawlerJob), (int)HttpStatusCode.NotAcceptable)]
+        [ProducesResponseType(typeof(CrawlerJob), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(CrawlerJob), (int)HttpStatusCode.BadRequest)]
         public ActionResult<CrawlerJob> CancelJob(string jobId)
         {
             try

@@ -1,7 +1,7 @@
+using System.Text;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using BugSearch.Shared.Models;
-using MongoDB.Bson.Serialization;
 
 namespace BugSearch.Shared.Services;
 
@@ -66,6 +66,33 @@ public class DatabaseConntection
         return result;
     }
 
+    public string SugestedQueryByLevenshtein(string query)
+    {
+        var terms = _collectionDictionary.Find(x => true).ToList();
+        var queryTerms = query.Split(' ');
+
+        StringBuilder sugestedQuery = new();
+
+        foreach (var term in queryTerms)
+        {
+            var sugestedTerm = terms
+                .Where(x => x.Term.LevenshteinDistance(term) < 4)
+                .OrderBy(x => x.Term.LevenshteinDistance(term))
+                .FirstOrDefault();
+
+            if (sugestedTerm != null)
+            {
+                sugestedQuery.Append($"{sugestedTerm.Term} ");
+            }
+            else
+            {
+                sugestedQuery.Append($"{term} ");
+            }
+        }
+
+        return sugestedQuery.ToString().Trim();
+    }
+
     public SearchResult FindWebSites(string id, string query, int currentPage, int itemsPerPage = 20)
     {
         SearchResult result   = new(id, query);
@@ -114,8 +141,8 @@ public class DatabaseConntection
                     (x.Title.ContainsNormalized(query) ? 1 * term.Length * 70 : term.Length * -5) +
                     (x.Name.ContainsNormalized(term) ? 1 * term.Length * 20 : term.Length * -0.1) +
                     (x.Name.ContainsNormalized(query) ? 1 * term.Length * 30 : term.Length * -0.3) +
-                    (x.Title.LevenshteinDistance(term) * term.Length * -3.31) +
-                    (x.Name.LevenshteinDistance(term) * term.Length * -1.15));
+                    (x.Title.LevenshteinDistance(term) * term.Length * -0.31) +
+                    (x.Name.LevenshteinDistance(term) * term.Length * -0.15));
             });
 
             x.Pts += (

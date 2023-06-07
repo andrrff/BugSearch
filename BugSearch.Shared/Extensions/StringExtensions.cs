@@ -68,6 +68,24 @@ public static class StringExtensions
         return dp[word1.Length, word2.Length];
     }
 
+    public static string FindClosestTerm(string term, List<string> dictionary)
+    {
+        string closestTerm = string.Empty;
+        int minDistance = int.MaxValue;
+
+        foreach (string dictTerm in dictionary)
+        {
+            int distance = LevenshteinDistance(term, dictTerm);
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                closestTerm = dictTerm;
+            }
+        }
+
+        return closestTerm;
+    }
+
     public static int CalculateWordDistance(this string sentence, string word1, string word2)
     {
         string[] words = sentence.Split(' ');
