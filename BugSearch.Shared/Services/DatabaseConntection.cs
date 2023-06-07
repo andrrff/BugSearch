@@ -113,8 +113,17 @@ public class DatabaseConntection
                     (x.Title.ContainsNormalized(term) ? 1 * term.Length * 60 : term.Length * -10) +
                     (x.Title.ContainsNormalized(query) ? 1 * term.Length * 70 : term.Length * -5) +
                     (x.Name.ContainsNormalized(term) ? 1 * term.Length * 20 : term.Length * -0.1) +
-                    (x.Name.ContainsNormalized(query) ? 1 * term.Length * 30 : term.Length * -0.3));
+                    (x.Name.ContainsNormalized(query) ? 1 * term.Length * 30 : term.Length * -0.3) +
+                    (x.Title.LevenshteinDistance(term) * term.Length * -3.31) +
+                    (x.Name.LevenshteinDistance(term) * term.Length * -1.15));
             });
+
+            x.Pts += (
+                x.Body.CalculateMeanWordDistance(terms.ToArray()) * -3.25 +
+                x.Description.CalculateMeanWordDistance(terms.ToArray()) * -4.3 +
+                x.Url.CalculateMeanWordDistance(terms.ToArray()) * -1.1 +
+                x.Title.CalculateMeanWordDistance(terms.ToArray()) * -5.4
+            );
 
             result.SearchResults.Add(new WebSiteInfo
             {
