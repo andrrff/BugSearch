@@ -47,6 +47,7 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft.AspNetCore.Authentication", LogEventLevel.Warning)
     .Enrich.FromLogContext()
     .WriteTo.Seq(Environment.GetEnvironmentVariable("SEQ_URL") ?? "http://localhost:5341")
+    .WriteTo.Console()
     .CreateLogger();
 
 app.UseSwagger();

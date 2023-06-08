@@ -25,16 +25,18 @@ public class SearchController : ControllerBase
     /// <param name="q" example="Ultimas noticias">Query a ser enviada</param>
     /// <param name="p" example="1">Pagina atual</param>
     /// <param name="m" example="20">Quantidade de itens por pagina</param>
+    /// <param name="s" example="false">Se deve buscar por sugestões</param>
     /// <returns>Lista de resultados</returns>
     /// <response code="200">Retorna a lista de resultados</response>
     [HttpGet(Name = "GetSearch")]
     [ProducesResponseType(typeof(SearchResult), (int)HttpStatusCode.OK)]
-    public SearchResult Get([FromQuery] string q, [FromQuery] int p = 1, [FromQuery] int m = 20)
+    public SearchResult Get([FromQuery] string q, [FromQuery] int p = 1, [FromQuery] int m = 20, [FromQuery] bool s = false)
     {
         var reqId = Guid.NewGuid().ToString();
 
         try
         {
+            q = s ? _context.SugestedQueryByLevenshtein(q) : q;
             Log.Logger.Information("{RequestId} - GetSearch: {Query}, {Param}, {Mode} (API)", reqId.Replace(Environment.NewLine, string.Empty), q.Replace(Environment.NewLine, string.Empty), p, m);
             var result = _context.FindWebSites(reqId, q, p, m);
             return result.GetPage(p, m);

@@ -2,6 +2,8 @@ using System.Text;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using BugSearch.Shared.Models;
+using BugSearch.Shared.Extensions;
+using Microsoft.Extensions.Configuration;
 
 namespace BugSearch.Shared.Services;
 
@@ -12,13 +14,17 @@ public class DatabaseConntection
 
     public DatabaseConntection()
     {
-        var url      = Environment.GetEnvironmentVariable("MONGO_DATABASE_URL") ?? "localhost:27017";
-        var username = Environment.GetEnvironmentVariable("MONGO_USERNAME") ?? "admin";
-        var password = Environment.GetEnvironmentVariable("MONGO_PASSWORD") ?? "senha_admin";
+        IConfiguration configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+            .Build();
 
-        var databaseName               = Environment.GetEnvironmentVariable("MONGO_DATABASE") ?? "BugSearchDBV2";
-        var collectionDictionaryName   = Environment.GetEnvironmentVariable("MONGO_COLLECTION_DICTIONARY") ?? "dictionary";
-        var collectionEventCrawlerName = Environment.GetEnvironmentVariable("MONGO_COLLECTION_EVENT_CRAWLER") ?? "eventcrawler";
+        var url      = Environment.GetEnvironmentVariable("MONGO_DATABASE_URL") ?? configuration.GetSection("Mongo:DatabaseUrl").Value;
+        var username = Environment.GetEnvironmentVariable("MONGO_USERNAME") ?? configuration.GetSection("Mongo:Username").Value;
+        var password = Environment.GetEnvironmentVariable("MONGO_PASSWORD") ?? configuration.GetSection("Mongo:Password").Value;
+
+        var databaseName               = Environment.GetEnvironmentVariable("MONGO_DATABASE") ?? configuration.GetSection("Mongo:Database").Value;
+        var collectionDictionaryName   = Environment.GetEnvironmentVariable("MONGO_COLLECTION_DICTIONARY") ?? configuration.GetSection("Mongo:Collections:Dictionary").Value;
+        var collectionEventCrawlerName = Environment.GetEnvironmentVariable("MONGO_COLLECTION_EVENT_CRAWLER") ?? configuration.GetSection("Mongo:Collections:EventCrawler").Value;
 
         var connectionUri = $"mongodb://{username}:{password}@{url}/admin";
 
@@ -76,11 +82,11 @@ public class DatabaseConntection
         foreach (var term in queryTerms)
         {
             var sugestedTerm = terms
-                .Where(x => x.Term.LevenshteinDistance(term) < 4)
+                .Where(x => x.Term.LevenshteinDistance(term) < 3)
                 .OrderBy(x => x.Term.LevenshteinDistance(term))
                 .FirstOrDefault();
 
-            if (sugestedTerm != null)
+            if (sugestedTerm is not null)
             {
                 sugestedQuery.Append($"{sugestedTerm.Term} ");
             }
@@ -149,7 +155,12 @@ public class DatabaseConntection
                 x.Body.CalculateMeanWordDistance(terms.ToArray()) * -3.25 +
                 x.Description.CalculateMeanWordDistance(terms.ToArray()) * -4.3 +
                 x.Url.CalculateMeanWordDistance(terms.ToArray()) * -1.1 +
-                x.Title.CalculateMeanWordDistance(terms.ToArray()) * -5.4
+                x.Title.CalculateMeanWordDistance(terms.ToArray()) * -5.4 +
+                x.Name.CalculateTFIDFLog(terms.ToArray()) * 0.5 +
+                x.Title.CalculateTFIDFLog(terms.ToArray()) * 0.5 +
+                x.Description.CalculateTFIDFLog(terms.ToArray()) * 0.5 +
+                x.Url.CalculateTFIDFLog(terms.ToArray()) * 0.5 +
+                x.Body.CalculateTFIDFLog(terms.ToArray()) * 0.5
             );
 
             result.SearchResults.Add(new WebSiteInfo

@@ -7,19 +7,19 @@ namespace BugSearch.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class SugestionController : ControllerBase
+public class SuggestionController : ControllerBase
 {
     private readonly DatabaseConntection _context;
 
-    public SugestionController()
+    public SuggestionController()
     {
         _context = new DatabaseConntection();
     }
 
     /// <summary>
-    /// Get sugestion for query
+    /// Get suggestion for query
     /// </summary>
-    /// <param name="q"></param>
+    /// <param name="q" example="t4rmo quitro">Query</param>
     /// <returns></returns>
     /// <response code="200">Returns sugestion for query</response>
     /// <response code="400">If the query is null</response>

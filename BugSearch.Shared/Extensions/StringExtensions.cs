@@ -1,7 +1,7 @@
 using System.Text;
 using System.Globalization;
 
-// namespace BugSearch.Shared.Extensions;
+namespace BugSearch.Shared.Extensions;
 
 public static class StringExtensions
 {
@@ -67,6 +67,26 @@ public static class StringExtensions
 
         return dp[word1.Length, word2.Length];
     }
+
+    public static int LevenshteinDistance(this Dictionary<string, double>? dict, string word2)
+    {
+        if (dict == null)
+            return 0;
+
+        int minDistance = int.MaxValue;
+
+        foreach (KeyValuePair<string, double> pair in dict)
+        {
+            int distance = LevenshteinDistance(pair.Key, word2);
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+            }
+        }
+
+        return minDistance;
+    }
+    
 
     public static string FindClosestTerm(string term, List<string> dictionary)
     {
@@ -143,4 +163,119 @@ public static class StringExtensions
         return meanDistance;
     }
 
+    public static double CalculateTFIDF(this string? sentence, string[] words, Dictionary<string, double> idfDictionary)
+    {
+        if (string.IsNullOrEmpty(sentence))
+            return -1;
+
+        string[] sentenceWords = sentence.Split(' ');
+
+        double[] tf = new double[words.Length];
+        for (int i = 0; i < words.Length; i++)
+        {
+            int wordCount = sentenceWords.Count(x => x == words[i]);
+            tf[i] = (double)wordCount / sentenceWords.Length;
+        }
+
+        double tfidf = 0;
+        for (int i = 0; i < words.Length; i++)
+        {
+            tfidf += tf[i] * idfDictionary[words[i]];
+        }
+
+        return tfidf;
+    }
+
+    public static double CalculateTFIDF(this string? sentence, string[] words)
+    {
+        if (string.IsNullOrEmpty(sentence))
+            return -1;
+
+        string[] sentenceWords = sentence.Split(' ');
+
+        double[] tf = new double[words.Length];
+        for (int i = 0; i < words.Length; i++)
+        {
+            int wordCount = sentenceWords.Count(x => x == words[i]);
+            tf[i] = (double)wordCount / sentenceWords.Length;
+        }
+
+        double tfidf = 0;
+        for (int i = 0; i < words.Length; i++)
+        {
+            tfidf += tf[i];
+        }
+
+        return tfidf;
+    }
+
+    public static double CalculateTFIDFLog(this string? sentence, string[] words)
+    {
+        if (string.IsNullOrEmpty(sentence))
+            return -1;
+
+        string[] sentenceWords = sentence.Split(' ');
+
+        double[] tf = new double[words.Length];
+        for (int i = 0; i < words.Length; i++)
+        {
+            int wordCount = sentenceWords.Count(x => x == words[i]);
+            tf[i] = (double)wordCount / sentenceWords.Length;
+        }
+
+        double tfidf = 0;
+        for (int i = 0; i < words.Length; i++)
+        {
+            tfidf += Math.Log(tf[i] + 1);
+        }
+
+        return tfidf;
+    }
+
+    public static double CalculateTFIDFLog(this string? sentence, string[] words, Dictionary<string, double>? idfDictionary)
+    {
+        if (string.IsNullOrEmpty(sentence) || idfDictionary is null)
+            return -1;
+
+        string[] sentenceWords = sentence.Split(' ');
+
+        double[] tf = new double[words.Length];
+        for (int i = 0; i < words.Length; i++)
+        {
+            int wordCount = sentenceWords.Count(x => x == words[i]);
+            tf[i] = (double)wordCount / sentenceWords.Length;
+        }
+
+        double tfidf = 0;
+        for (int i = 0; i < words.Length; i++)
+        {
+            tfidf += Math.Log(tf[i] + 1) * idfDictionary[words[i]];
+        }
+
+        return tfidf;
+    }
+
+
+    public static Dictionary<string, double> CalculateTFIDFLogDict(this string? sentence, string[] words)
+    {
+        if (string.IsNullOrEmpty(sentence))
+            return new Dictionary<string, double>();
+
+        string[] sentenceWords = sentence.Split(' ');
+
+        double[] tf = new double[words.Length];
+        for (int i = 0; i < words.Length; i++)
+        {
+            int wordCount = sentenceWords.Count(x => x == words[i]);
+            tf[i] = (double)wordCount / sentenceWords.Length;
+        }
+
+        Dictionary<string, double> tfidfDict = new Dictionary<string, double>();
+        for (int i = 0; i < words.Length; i++)
+        {
+            tfidfDict.Add(words[i], Math.Log(tf[i] + 1));
+        }
+
+        return tfidfDict;
+    }
 }
