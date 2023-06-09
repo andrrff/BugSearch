@@ -4,6 +4,7 @@ using MongoDB.Driver;
 using BugSearch.Shared.Models;
 using BugSearch.Shared.Extensions;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
 
 namespace BugSearch.Shared.Services;
 
