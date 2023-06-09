@@ -4,7 +4,6 @@ using MongoDB.Driver;
 using BugSearch.Shared.Models;
 using BugSearch.Shared.Extensions;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.Json;
 
 namespace BugSearch.Shared.Services;
 
@@ -16,7 +15,7 @@ public class DatabaseConntection
     public DatabaseConntection()
     {
         IConfiguration configuration = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+            // .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
             .Build();
 
         var url      = Environment.GetEnvironmentVariable("MONGO_DATABASE_URL") ?? configuration.GetSection("Mongo:DatabaseUrl").Value;
