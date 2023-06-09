@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . .
 
 # Build the project
-RUN dotnet publish -c Release -o out
+RUN dotnet publish src/BugSearch.Api/BugSearch.Api.csproj -c Release -o out
 
 # Build the runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:7.0-alpine
