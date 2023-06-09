@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: crawler-bot
+  name: rabbitmq-configmap
+data:
+  hostname: rabbitmq-bugsearch.eastus.cloudapp.azure.com
+  port: "5672"
+  exchange: BugSearch

@@ -1,0 +1,12 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "OPENAI_KEY": "<OPENAI_KEY>",
+    "MONGO_USERNAME": "admin",
+    "MONGO_PASSWORD": "senha_admin",
+    "MONGO_DATABASE_URL": "localhost:27017",
+    "MONGO_DATABASE": "BugSearchDBV2",
+    "MONGO_COLLECTION_DICTIONARY": "dictionary",
+    "MONGO_COLLECTION_EVENT_CRAWLER": "eventcrawler"
+  }
+}

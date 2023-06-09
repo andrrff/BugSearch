@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bugsearchcrawler-service
+  labels:
+    app: bugsearchcrawler-service
+  namespace: crawler-bot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bugsearchcrawler-service
+  template:
+    metadata:
+      labels:
+        app: bugsearchcrawler-service
+    spec:
+      containers:
+        - name: bugsearchcrawler-service
+          image: acrworkflow1684607545542.azurecr.io/bugsearchcrawler:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: MONGO_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-creds
+                  key: username
+            - name: MONGO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-creds
+                  key: password
+            - name: MONGO_DATABASE_URL
+              valueFrom: 
+                configMapKeyRef:
+                  name: mongodb-configmap
+                  key: database_url
+            - name: MONGO_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: mongodb-configmap
+                  key: database
+            - name: MONGO_COLLECTION_DICTIONARY
+              valueFrom:
+                configMapKeyRef:
+                  name: mongodb-configmap
+                  key: collection_dictionary
+            - name: MONGO_COLLECTION_EVENT_CRAWLER
+              valueFrom:
+                configMapKeyRef:
+                  name: mongodb-configmap
+                  key: collection_event_crawler
+            - name: RABBITMQ_HOSTNAME
+              valueFrom: 
+                configMapKeyRef:
+                  name: rabbitmq-configmap
+                  key: hostname
+            - name: RABBITMQ_PORT
+              valueFrom: 
+                configMapKeyRef:
+                  name: rabbitmq-configmap
+                  key: port
+            - name: RABBITMQ_EXCHANGE
+              valueFrom: 
+                configMapKeyRef:
+                  name: rabbitmq-configmap
+                  key: exchange
+            - name: RABBITMQ_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-creds
+                  key: username
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-creds
+                  key: password
+            - name: SEQ_URL
+              valueFrom: 
+                configMapKeyRef:
+                  name: seq-configmap
+                  key: log_url

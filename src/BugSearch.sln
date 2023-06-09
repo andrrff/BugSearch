@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BugSearch.Api", "BugSearch.Api\BugSearch.Api.csproj", "{ECA30E68-01D9-42BC-A667-E06CE99E0BCF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BugSearch.Shared", "BugSearch.Shared\BugSearch.Shared.csproj", "{8AD36AEE-12EA-4C7A-8C18-2B06E8AA14C6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BugSearch.Crawler", "BugSearch.Crawler\BugSearch.Crawler.csproj", "{FB4EB492-E5CC-40DB-B48C-0F4FDF0FEB81}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ECA30E68-01D9-42BC-A667-E06CE99E0BCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECA30E68-01D9-42BC-A667-E06CE99E0BCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECA30E68-01D9-42BC-A667-E06CE99E0BCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECA30E68-01D9-42BC-A667-E06CE99E0BCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8AD36AEE-12EA-4C7A-8C18-2B06E8AA14C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8AD36AEE-12EA-4C7A-8C18-2B06E8AA14C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8AD36AEE-12EA-4C7A-8C18-2B06E8AA14C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8AD36AEE-12EA-4C7A-8C18-2B06E8AA14C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB4EB492-E5CC-40DB-B48C-0F4FDF0FEB81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB4EB492-E5CC-40DB-B48C-0F4FDF0FEB81}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB4EB492-E5CC-40DB-B48C-0F4FDF0FEB81}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB4EB492-E5CC-40DB-B48C-0F4FDF0FEB81}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
