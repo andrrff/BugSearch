@@ -2,7 +2,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:7.0-alpine AS build
 
 # Set the working directory
-WORKDIR /app/src/BugSearch.Api
+WORKDIR /app
 
 # Copy the project files
 COPY . .
