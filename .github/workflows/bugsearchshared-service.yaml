@@ -2,7 +2,7 @@ name: bugsearchshared-service
 "on":
     push:
         paths:
-            - 'BugSearch.Shared/Manifests/**'
+            - 'src/BugSearch.Shared/Manifests/**'
         branches:
             - master
     workflow_dispatch: {}
@@ -12,22 +12,22 @@ env:
     CLUSTER_NAME: BugSearch
     CLUSTER_RESOURCE_GROUP: ifma-crawler
     DEPLOYMENT_MANIFEST_PATH: |
-        BugSearch.Shared/Manifests/RabbitMQ/rabbitmq-cluster.yaml
-        BugSearch.Shared/Manifests/RabbitMQ/rabbitmq-secrets.yaml
-        BugSearch.Shared/Manifests/RabbitMQ/rabbitmq-configmap.yaml
-        BugSearch.Shared/Manifests/MongoDB/mongodb-configmap.yaml
-        BugSearch.Shared/Manifests/MongoDB/mongodb-deployment.yaml
-        BugSearch.Shared/Manifests/MongoDB/mongodb-service.yaml
-        BugSearch.Shared/Manifests/MongoDB/mongodb-pv.yaml
-        BugSearch.Shared/Manifests/MongoDB/mongodb-pvc.yaml
-        BugSearch.Shared/Manifests/MongoDB/mongodb-secrets.yaml
-        BugSearch.Shared/Manifests/MongoExpress/mongoexpress-deployment.yaml
-        BugSearch.Shared/Manifests/MongoExpress/mongoexpress-service.yaml
-        BugSearch.Shared/Manifests/AAD/aad-secrets.yaml
-        BugSearch.Shared/Manifests/OpenAI/openai-secrets.yaml
-        BugSearch.Shared/Manifests/Seq/seq-configmap.yaml
-        BugSearch.Shared/Manifests/Seq/seq-deployment.yaml
-        BugSearch.Shared/Manifests/Seq/seq-service.yaml
+        src/BugSearch.Shared/Manifests/RabbitMQ/rabbitmq-cluster.yaml
+        src/BugSearch.Shared/Manifests/RabbitMQ/rabbitmq-secrets.yaml
+        src/BugSearch.Shared/Manifests/RabbitMQ/rabbitmq-configmap.yaml
+        src/BugSearch.Shared/Manifests/MongoDB/mongodb-configmap.yaml
+        src/BugSearch.Shared/Manifests/MongoDB/mongodb-deployment.yaml
+        src/BugSearch.Shared/Manifests/MongoDB/mongodb-service.yaml
+        src/BugSearch.Shared/Manifests/MongoDB/mongodb-pv.yaml
+        src/BugSearch.Shared/Manifests/MongoDB/mongodb-pvc.yaml
+        src/BugSearch.Shared/Manifests/MongoDB/mongodb-secrets.yaml
+        src/BugSearch.Shared/Manifests/MongoExpress/mongoexpress-deployment.yaml
+        src/BugSearch.Shared/Manifests/MongoExpress/mongoexpress-service.yaml
+        src/BugSearch.Shared/Manifests/AAD/aad-secrets.yaml
+        src/BugSearch.Shared/Manifests/OpenAI/openai-secrets.yaml
+        src/BugSearch.Shared/Manifests/Seq/seq-configmap.yaml
+        src/BugSearch.Shared/Manifests/Seq/seq-deployment.yaml
+        src/BugSearch.Shared/Manifests/Seq/seq-service.yaml
 jobs:
     buildImage:
         permissions:

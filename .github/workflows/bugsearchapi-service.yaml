@@ -2,11 +2,11 @@ name: bugsearchapi-service
 "on":
     push:
         paths:
-            - 'BugSearch.Api/**'
-            - 'BugSearch.Shared/Services/**'
-            - 'BugSearch.Shared/Singletons/**'
-            - 'BugSearch.Shared/Interfaces/**'
-            - 'BugSearch.Shared/Enums/**'
+            - 'src/BugSearch.Api/**'
+            - 'src/BugSearch.Shared/Services/**'
+            - 'src/BugSearch.Shared/Singletons/**'
+            - 'src/BugSearch.Shared/Interfaces/**'
+            - 'src/BugSearch.Shared/Enums/**'
         branches:
             - master
     workflow_dispatch: {}
@@ -17,9 +17,9 @@ env:
     CLUSTER_RESOURCE_GROUP: ifma-crawler
     CONTAINER_NAME: bugsearchapi
     DEPLOYMENT_MANIFEST_PATH: |
-        BugSearch.Api/Manifests/bugsearchapi-deployment.yaml
-        BugSearch.Api/Manifests/bugsearchapi-namespace.yaml
-        BugSearch.Api/Manifests/bugsearchapi-service.yaml
+        srcBugSearch.Api/Manifests/bugsearchapi-deployment.yaml
+        srcBugSearch.Api/Manifests/bugsearchapi-namespace.yaml
+        srcBugSearch.Api/Manifests/bugsearchapi-service.yaml
 jobs:
     buildImage:
         permissions:
@@ -35,7 +35,7 @@ jobs:
                 subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
                 tenant-id: ${{ secrets.AZURE_TENANT_ID }}
             - name: Build and push image to ACR
-              run: az acr build --image ${{ env.CONTAINER_NAME }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f BugSearch.Api/Dockerfile .
+              run: az acr build --image ${{ env.CONTAINER_NAME }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f src/BugSearch.Api/Dockerfile .
     deploy:
         permissions:
             actions: read

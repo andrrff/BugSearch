@@ -1,10 +1,10 @@
 version: 2
 updates:
   - package-ecosystem: "nuget"
-    directory: "/" # Localização dos arquivos de manifesto de pacote do .NET
+    directory: "/src" # Localização dos arquivos de manifesto de pacote do .NET
     schedule:
       interval: "weekly"
   - package-ecosystem: "docker"
-    directory: "/" # Localização dos arquivos de manifesto de imagem Docker
+    directory: "/src" # Localização dos arquivos de manifesto de imagem Docker
     schedule:
       interval: "weekly"
