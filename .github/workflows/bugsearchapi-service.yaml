@@ -17,9 +17,9 @@ env:
     CLUSTER_RESOURCE_GROUP: ifma-crawler
     CONTAINER_NAME: bugsearchapi
     DEPLOYMENT_MANIFEST_PATH: |
-        srcBugSearch.Api/Manifests/bugsearchapi-deployment.yaml
-        srcBugSearch.Api/Manifests/bugsearchapi-namespace.yaml
-        srcBugSearch.Api/Manifests/bugsearchapi-service.yaml
+        src/BugSearch.Api/Manifests/bugsearchapi-deployment.yaml
+        src/BugSearch.Api/Manifests/bugsearchapi-namespace.yaml
+        src/BugSearch.Api/Manifests/bugsearchapi-service.yaml
 jobs:
     buildImage:
         permissions:
