@@ -117,6 +117,20 @@ Aqui estão os exemplos de uso em uma tabela:
 
 ## Docker
 
+API:
+
+```shell
+docker build -t bugsearch-api:latest -f src/BugSearch.Api/Dockerfile .
+```
+
+Crawler:
+
+```shell
+
+```shell
+docker build -t bugsearch-crawler:latest -f src/BugSearch.Crawler/Dockerfile .
+```
+
 MongoDB:
 
 ```shell
