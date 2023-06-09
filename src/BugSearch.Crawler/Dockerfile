@@ -2,7 +2,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:7.0-alpine AS build
 
 # Set the working directory
-WORKDIR /app
+WORKDIR /app/src/BugSearch.Crawler
 
 # Copy the project files
 COPY . .
