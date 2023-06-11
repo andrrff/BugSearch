@@ -121,14 +121,14 @@ API:
 
 ```shell
 docker build -t bugsearch-api:latest -f src/BugSearch.Api/Dockerfile .
-docker run -d -p 80:80 -t bugsearch-api:latest
+docker run -d -p 8080:80 -t bugsearch-api:latest
 ```
 
 Crawler:
 
 ```shell
 docker build -t bugsearch-crawler:latest -f src/BugSearch.Crawler/Dockerfile .
-docker run -d -p 80:80 -t bugsearch-crawler:latest
+docker run -d -p 8081:80 -t bugsearch-crawler:latest
 ```
 
 MongoDB:
