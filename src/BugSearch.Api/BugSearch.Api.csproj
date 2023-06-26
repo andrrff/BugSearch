@@ -10,7 +10,7 @@
     <PackageReference Include="Microsoft.AspNet.Cors" Version="5.2.9">
       <NoWarn>$(NoWarn);NU1701</NoWarn>
     </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.8" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
